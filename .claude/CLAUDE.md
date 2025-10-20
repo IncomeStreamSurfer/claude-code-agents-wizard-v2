@@ -66,7 +66,16 @@ When given a project to generate SEO content:
    - ... Agent 10: Generate pages for pillar #10
    - **ALL 10 agents work simultaneously**
 
-### Step 5: COLLECT & ORGANIZE OUTPUT
+### Step 5: INTEGRATE NAVIGATION & ROUTING
+1. **Invoke Header-Footer Agent**
+   - Pass all 50 generated pages to header-footer agent
+   - Provide pillar/subpillar structure
+   - Include design system analysis
+   - Agent creates megamenu header and footer
+   - Agent sets up all routing
+   - Agent generates sitemap and robots.txt
+
+### Step 6: COLLECT & ORGANIZE OUTPUT
 1. **Aggregate Generated Pages**
    - Collect HTML/JSX files from all 10 agents
    - Verify all 50 pages generated successfully
@@ -77,19 +86,28 @@ When given a project to generate SEO content:
    - Store in database with metadata (pillar, subpillar, page)
    - Create index for CTA lookups
 
-3. **Report Results**
+3. **Verify Navigation Integration**
+   - Confirm megamenu header created
+   - Confirm footer navigation complete
+   - Verify all routes configured
+   - Test sitemap.xml generated
+   - Ensure no 404 errors
+
+4. **Report Results**
    - Document: 50 pages created
    - List: 10 pillars and 50 subpillar topics
    - Show: Design system applied consistently
    - Confirm: All CTAs stored in database (if applicable)
+   - Confirm: Navigation and routing complete
+   - Confirm: SEO functionality verified
 
-## 🛠️ The SEO Designer Agent
+## 🛠️ Available Agents
+
+### seo-designer
 
 **Purpose**: Generate 5 SEO-optimized landing pages with CTAs using project design system
 
-**Agent Name**: `seo-designer`
-
-**Invoked**: When orchestrator spawns all 10 agents (in parallel) using Task tool
+**Invoked**: 10 agents spawned in parallel (Step 4) using Task tool
 
 **Input per agent:**
 - 5 subpillar topics to create pages for
@@ -114,6 +132,36 @@ When given a project to generate SEO content:
 - CTAs are conversion-focused
 - SEO best practices applied
 - Database integration working (if applicable)
+
+### header-footer
+
+**Purpose**: Create megamenu navigation and routing for all 50 generated pages
+
+**Invoked**: Once after all seo-designer agents complete (Step 5) using Task tool
+
+**Input:**
+- All 50 generated page file paths
+- 10 pillar topics
+- 50 subpillar topics (organized by pillar)
+- Design system analysis
+- Project framework (Next.js, React, etc.)
+
+**Output:**
+- Megamenu header component with all 50 pages
+- Footer component with organized navigation
+- Routing configuration for all pages
+- Sitemap.xml with all URLs
+- Robots.txt file
+- Internal linking structure
+- Breadcrumb components (if needed)
+
+**Success criteria:**
+- All 50 pages accessible via navigation
+- Mobile responsive menu works
+- All routes configured correctly
+- Sitemap validates
+- No 404 errors
+- SEO functionality complete
 
 ## 📋 Example Workflow
 
