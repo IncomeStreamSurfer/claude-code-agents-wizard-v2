@@ -1,196 +1,341 @@
-# Claude Code Agent Orchestration System v2 🚀
+# Claude Code SEO Page Generator 🚀
 
-A simple yet powerful orchestration system for Claude Code that uses specialized agents to manage complex projects from start to finish, with mandatory human oversight and visual testing.
+An intelligent orchestration system that automatically generates 50 SEO-optimized landing pages for any business in parallel using Claude Code and design agents.
 
 ## 🎯 What Is This?
 
-This is a **custom Claude Code orchestration system** that transforms how you build software projects. Claude Code itself acts as the orchestrator with its 200k context window, managing the big picture while delegating individual tasks to specialized subagents:
+This is a **Claude Code-powered SEO content generation system** that transforms raw project information into 50 conversion-optimized, design-consistent landing pages - all generated in parallel.
 
-- **🧠 Claude (You)** - The orchestrator with 200k context managing todos and the big picture
-- **✍️ Coder Subagent** - Implements one todo at a time in its own clean context
-- **👁️ Tester Subagent** - Verifies implementations using Playwright in its own context
-- **🆘 Stuck Subagent** - Human escalation point when ANY problem occurs
+**The System:**
+- **🧠 Claude (You)** - The orchestrator with 200k context handling discovery, strategy, and agent orchestration
+- **🎨 Design Agents (10 parallel)** - Each generates 5 SEO pages simultaneously using the project's design system
+- **📊 CTA Database** - All call-to-action queries stored and tracked for conversion optimization
+
+**Total Output:** 50 SEO-optimized landing pages + conversion tracking data, generated in parallel
 
 ## ⚡ Key Features
 
-- **No Fallbacks**: When ANY agent hits a problem, you get asked - no assumptions, no workarounds
-- **Visual Testing**: Playwright MCP integration for screenshot-based verification
-- **Todo Tracking**: Always see exactly where your project stands
-- **Simple Flow**: Claude creates todos → delegates to coder → tester verifies → repeat
-- **Human Control**: The stuck agent ensures you're always in the loop
+- **Parallel Generation**: 10 agents spawn simultaneously → 50 pages generated 10x faster
+- **Design Consistency**: All pages use the discovered design system automatically
+- **SEO-Optimized**: Built-in schema markup, meta tags, keyword optimization
+- **Conversion-Focused**: 2-3 CTAs per page, database tracking
+- **Zero Manual Design**: Automatically analyzes and applies existing brand patterns
+- **Business-Aligned**: Strategy based on actual project discovery (20+ pages scanned)
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
 1. **Claude Code CLI** installed ([get it here](https://docs.claude.com/en/docs/claude-code))
-2. **Node.js** (for Playwright MCP)
+2. **Your SaaS/Application repository** with documentation and design files
 
-### Installation
+### Installation & Setup
+
+#### Step 1: Backup Your Existing Claude Config (Important!)
+
+If you already have Claude Code set up in your project:
 
 ```bash
-# Clone this repository
+cd /path/to/your/project
+
+# Back up your existing Claude config
+cp -r .claude ~/Desktop/.claude.backup
+# OR
+cp -r .claude ./claude-backup
+
+# Remove the existing configuration
+rm -rf .claude
+```
+
+**This preserves your existing setup in case you need it later.**
+
+#### Step 2: Import This Repository
+
+```bash
+# Copy this repository's .claude directory into your project
 git clone https://github.com/IncomeStreamSurfer/claude-code-agents-wizard-v2.git
 cd claude-code-agents-wizard-v2
+git checkout design-agent
 
-# Start Claude Code in this directory
+# Copy the .claude folder to your project
+cp -r .claude /path/to/your/project/.claude
+cp .mcp.json /path/to/your/project/.mcp.json
+
+# Navigate to your project
+cd /path/to/your/project
+```
+
+#### Step 3: Generate Your SEO Pages
+
+```bash
+# Start Claude Code in your project directory
 claude
+
+# Tell Claude to generate SEO pages
+You: "Generate 50 SEO pages for my [SaaS/Application name]"
+
+# Claude will:
+# 1. Scan your project documentation
+# 2. Analyze your design system
+# 3. Generate content strategy (10 pillars, 50 subpillars)
+# 4. Spawn 10 design agents in parallel
+# 5. Generate 50 SEO pages with CTAs
+# 6. Store all conversion data
 ```
 
-That's it! The agents are automatically loaded from the `.claude/` directory.
+### Example: Adding to Existing Project
 
-## 📖 How to Use
+```bash
+# Your SaaS project structure
+/my-saas/
+├── README.md
+├── docs/
+├── src/
+├── pages/
+└── .git/
 
-### Starting a Project
+# Step 1: Backup existing Claude config (if you have one)
+cp -r .claude ~/Desktop/.claude.backup 2>/dev/null || true
 
-When you want to build something, just tell Claude your requirements:
+# Step 2: Get the SEO generator
+cd ~
+git clone https://github.com/IncomeStreamSurfer/claude-code-agents-wizard-v2.git
+cd claude-code-agents-wizard-v2
+git checkout design-agent
 
-```
-You: "Build a todo app with React and TypeScript"
-```
+# Step 3: Copy to your project
+cp -r .claude /path/to/my-saas/.claude
+cp .mcp.json /path/to/my-saas/.mcp.json
 
-Claude will automatically:
-1. Create a detailed todo list using TodoWrite
-2. Delegate the first todo to the **coder** subagent
-3. The coder implements in its own clean context window
-4. Delegate verification to the **tester** subagent (Playwright screenshots)
-5. If ANY problem occurs, the **stuck** subagent asks you what to do
-6. Mark todo complete and move to the next one
-7. Repeat until project complete
+# Step 4: Generate SEO pages
+cd /path/to/my-saas
+claude
 
-### The Workflow
-
-```
-USER: "Build X"
-    ↓
-CLAUDE: Creates detailed todos with TodoWrite
-    ↓
-CLAUDE: Invokes coder subagent for todo #1
-    ↓
-CODER (own context): Implements feature
-    ↓
-    ├─→ Problem? → Invokes STUCK → You decide → Continue
-    ↓
-CODER: Reports completion
-    ↓
-CLAUDE: Invokes tester subagent
-    ↓
-TESTER (own context): Playwright screenshots & verification
-    ↓
-    ├─→ Test fails? → Invokes STUCK → You decide → Continue
-    ↓
-TESTER: Reports success
-    ↓
-CLAUDE: Marks todo complete, moves to next
-    ↓
-Repeat until all todos done ✅
+# In Claude: "Generate 50 SEO pages for my SaaS"
 ```
 
-## 🛠️ How It Works
+### Restoring Your Original Setup (Optional)
 
-### Claude (The Orchestrator)
-**Your 200k Context Window**
+If you want to go back to your original Claude Code setup:
 
-- Creates and maintains comprehensive todo lists
-- Sees the complete project from A-Z
-- Delegates individual todos to specialized subagents
-- Tracks overall progress across all tasks
-- Maintains project state and context
+```bash
+# Remove the SEO generator config
+rm -rf .claude
 
-**How it works**: Claude IS the orchestrator - it uses its 200k context to manage everything
+# Restore from backup
+cp -r ~/Desktop/.claude.backup .claude
+# OR if you backed up in project
+cp -r ./claude-backup .claude
+```
 
-### Coder Subagent
-**Fresh Context Per Task**
+## 📖 How It Works
 
-- Gets invoked with ONE specific todo item
-- Works in its own clean context window
-- Writes clean, functional code
-- **Never uses fallbacks** - invokes stuck agent immediately
-- Reports completion back to Claude
-
-**When it's used**: Claude delegates each coding todo to this subagent
-
-### Tester Subagent
-**Fresh Context Per Verification**
-
-- Gets invoked after each coder completion
-- Works in its own clean context window
-- Uses **Playwright MCP** to see rendered output
-- Takes screenshots to verify layouts
-- Tests interactions (clicks, forms, navigation)
-- **Never marks failing tests as passing**
-- Reports pass/fail back to Claude
-
-**When it's used**: Claude delegates testing after every implementation
-
-### Stuck Subagent
-**Fresh Context Per Problem**
-
-- Gets invoked when coder or tester hits a problem
-- Works in its own clean context window
-- **ONLY subagent** that can ask you questions
-- Presents clear options for you to choose
-- Blocks progress until you respond
-- Returns your decision to the calling agent
-- Ensures no blind fallbacks or workarounds
-
-**When it's used**: Whenever ANY subagent encounters ANY problem
-
-## 🚨 The "No Fallbacks" Rule
-
-**This is the key differentiator:**
-
-Traditional AI: Hits error → tries workaround → might fail silently
-**This system**: Hits error → asks you → you decide → proceeds correctly
-
-Every agent is **hardwired** to invoke the stuck agent rather than use fallbacks. You stay in control.
-
-## 💡 Example Session
+### The Complete Workflow
 
 ```
-You: "Build a landing page with a contact form"
+YOU: "Generate 50 SEO pages for my [project]"
+    ↓
+CLAUDE discovers & analyzes:
+  - Reads 20+ project pages/docs
+  - Extracts business model, value prop, audience
+  - Analyzes design system (colors, typography, components)
+  - Checks for database configuration
+    ↓
+CLAUDE generates strategy:
+  - Creates 10 pillar topics (main content pillars)
+  - Creates 50 subpillar topics (5 per pillar)
+  - Aligns with business offerings and audience needs
+    ↓
+CLAUDE analyzes design system:
+  - Extracts CSS framework (Tailwind, Bootstrap, etc.)
+  - Documents brand colors and typography
+  - Identifies component patterns
+  - Prepares design brief for agents
+    ↓
+CLAUDE spawns 10 design agents simultaneously:
+  - Agent 1: Generates 5 pages for pillar 1
+  - Agent 2: Generates 5 pages for pillar 2
+  - ... (all work in parallel)
+  - Agent 10: Generates 5 pages for pillar 10
+    ↓
+DESIGN AGENTS generate pages:
+  - 1000-2000 words of SEO-optimized content
+  - 2-3 conversion-focused CTAs per page
+  - Design system applied consistently
+  - Schema markup included
+  - Internal linking structure
+    ↓
+CLAUDE collects & organizes:
+  - 50 pages generated ✓
+  - CTA data stored in database ✓
+  - Design consistency verified ✓
+  - Ready for deployment ✓
+```
 
-Claude creates todos:
-  [ ] Set up HTML structure
-  [ ] Create hero section
-  [ ] Add contact form with validation
-  [ ] Style with CSS
-  [ ] Test form submission
+## 🛠️ What Claude Does
 
-Claude invokes coder(todo #1: "Set up HTML structure")
+### Step 1: Discovery Phase
+Claude reads your project to understand:
+- **Business Model**: What does this project do?
+- **Value Proposition**: What problems does it solve?
+- **Target Audience**: Who are the ideal customers?
+- **Design System**: Colors, typography, components, patterns
+- **Database**: Where to store conversion data
 
-Coder (own context): Creates index.html
-Coder: Reports completion to Claude
+### Step 2: Strategy Phase
+Claude generates content strategy:
+- **10 Pillar Topics** - Main content pillars aligned with business
+- **50 Subpillar Topics** - Specific, actionable topics for each page
+- Example for SaaS email tool:
+  - Pillar: "Email Automation Fundamentals"
+    - Subpillar 1: Getting Started with Email Automation
+    - Subpillar 2: Building Your First Workflow
+    - Subpillar 3: Email Template Design
+    - Subpillar 4: Automation Rules & Logic
+    - Subpillar 5: Scheduling & Send Optimization
 
-Claude invokes tester("Verify HTML structure loads")
+### Step 3: Design Analysis
+Claude extracts design system:
+- CSS Framework (Tailwind, Bootstrap, custom)
+- Color palette and brand colors
+- Typography hierarchy
+- Component patterns
+- Spacing and layout rules
 
-Tester (own context): Uses Playwright to navigate
-Tester: Takes screenshot
-Tester: Verifies HTML structure visible
-Tester: Reports success to Claude
+### Step 4: Agent Orchestration
+Claude spawns 10 design agents in parallel:
+- Each agent receives 5 subpillar topics
+- Each agent receives complete design system
+- Each agent receives database schema
+- All agents work simultaneously
 
-Claude: Marks todo #1 complete ✓
+### Step 5: Collection & Reporting
+Claude aggregates results:
+- Collects 50 generated pages
+- Stores all CTAs in database
+- Verifies design consistency
+- Reports results
 
-Claude invokes coder(todo #2: "Create hero section")
+## 🎨 What Design Agents Do
 
-Coder (own context): Implements hero section
-Coder: ERROR - image file not found
-Coder: Invokes stuck subagent
+Each design agent generates 5 SEO-optimized landing pages:
 
-Stuck (own context): Asks YOU:
-  "Hero image 'hero.jpg' not found. How to proceed?"
-  Options:
-  - Use placeholder image
-  - Download from Unsplash
-  - Skip image for now
+**Per Page:**
+- SEO-optimized title (60 chars, includes keywords)
+- Meta description (160 chars, includes CTA hint)
+- H1 (keyword-rich, matches search intent)
+- 1000-2000 words of high-quality content
+- 2-3 conversion-focused CTAs
+- Internal linking to related pages
+- Schema.org markup
+- Design system components applied
 
-You choose: "Download from Unsplash"
+**Per Agent:**
+- All 5 pages use brand design system
+- Consistent color scheme across pages
+- Matching typography and spacing
+- Responsive design (mobile, tablet, desktop)
+- 15 total CTAs (stored in database)
 
-Stuck: Returns your decision to coder
-Coder: Proceeds with Unsplash download
-Coder: Reports completion to Claude
+## 📊 Output Structure
 
-... and so on until all todos done
+```
+/output/
+├── pillar-1/
+│   ├── subpillar-1.html
+│   ├── subpillar-2.html
+│   ├── subpillar-3.html
+│   ├── subpillar-4.html
+│   └── subpillar-5.html
+├── pillar-2/
+│   ├── subpillar-1.html
+│   ├── subpillar-2.html
+│   ├── subpillar-3.html
+│   ├── subpillar-4.html
+│   └── subpillar-5.html
+... (8 more pillar folders)
+└── database/
+    └── cta_queries.json (or database storage)
+```
+
+**Database Schema Example:**
+```json
+{
+  "cta_queries": [
+    {
+      "id": 1,
+      "pillar": "Email Automation Fundamentals",
+      "subpillar": "Getting Started with Email Automation",
+      "page_slug": "/email-automation/getting-started",
+      "cta_text": "Start Free 14-Day Trial",
+      "cta_type": "primary"
+    },
+    {
+      "id": 2,
+      "pillar": "Email Automation Fundamentals",
+      "subpillar": "Getting Started with Email Automation",
+      "page_slug": "/email-automation/getting-started",
+      "cta_text": "Schedule Demo",
+      "cta_type": "secondary"
+    }
+    // ... 123 more CTAs
+  ]
+}
+```
+
+## 💡 Example: Email Automation SaaS
+
+**Input:** Product that automates email workflows for teams
+
+**Discovery:**
+- Business: Email workflow automation
+- Audience: Marketing teams, agencies, business owners
+- Value Prop: Save 20+ hours/week on email management
+- Design: Tailwind CSS, blue primary (#2563EB), modern sans-serif
+
+**Generated Pillars:**
+1. Email Automation Fundamentals
+2. Workflow Integration Patterns
+3. Team Collaboration Features
+4. Analytics & Reporting
+5. Security & Compliance
+6. API & Developer Tools
+7. Templates & Presets
+8. Troubleshooting & Support
+9. Migration Guides
+10. Industry-Specific Solutions
+
+**Generated Subpillars (50 total):**
+- Getting Started with Email Automation
+- Building Your First Workflow
+- Email Template Design
+- Automation Rules & Logic
+- Scheduling & Send Optimization
+- ... (45 more)
+
+**Output:**
+- 50 SEO pages generated
+- 125 CTAs tracked in database
+- All pages design-consistent
+- Ready for deployment
+
+## 🚀 Usage
+
+### Generate Pages
+
+```bash
+claude
+
+You: "Generate 50 SEO pages for my SaaS tool"
+
+Claude will:
+1. Scan your project documentation
+2. Generate pillar strategy
+3. Analyze design system
+4. Spawn 10 design agents
+5. Generate 50 pages in parallel
+6. Store CTAs in database
+7. Report results
 ```
 
 ## 📁 Repository Structure
@@ -198,12 +343,10 @@ Coder: Reports completion to Claude
 ```
 .
 ├── .claude/
-│   ├── CLAUDE.md              # Orchestration instructions for main Claude
+│   ├── CLAUDE.md              # SEO orchestrator instructions
 │   └── agents/
-│       ├── coder.md          # Coder subagent definition
-│       ├── tester.md         # Tester subagent definition
-│       └── stuck.md          # Stuck subagent definition
-├── .mcp.json                  # Playwright MCP configuration
+│       └── design-agent.md    # Design agent specification
+├── .mcp.json                  # Playwright/MCP config
 ├── .gitignore
 └── README.md
 ```
@@ -213,67 +356,77 @@ Coder: Reports completion to Claude
 ### Resources
 
 - **[SEO Grove](https://seogrove.ai)** - AI-powered SEO automation platform
-- **[ISS AI Automation School](https://www.skool.com/iss-ai-automation-school-6342/about)** - Join our community to learn AI automation
-- **[Income Stream Surfers YouTube](https://www.youtube.com/incomestreamsurfers)** - Tutorials, breakdowns, and AI automation content
+- **[ISS AI Automation School](https://www.skool.com/iss-ai-automation-school-6342/about)** - Learn AI automation
+- **[Income Stream Surfers YouTube](https://www.youtube.com/incomestreamsurfers)** - Tutorials and breakdowns
 
 ### Support
 
-Have questions or want to share what you built?
 - Join the [ISS AI Automation School community](https://www.skool.com/iss-ai-automation-school-6342/about)
 - Subscribe to [Income Stream Surfers on YouTube](https://www.youtube.com/incomestreamsurfers)
 - Check out [SEO Grove](https://seogrove.ai) for automated SEO solutions
 
 ## 🤝 Contributing
 
-This is an open system! Feel free to:
-- Add new specialized agents
-- Improve existing agent prompts
-- Share your agent configurations
-- Submit PRs with enhancements
+This system is open! Feel free to:
+- Improve orchestrator discovery logic
+- Enhance design agent prompts
+- Add database integrations
+- Submit PRs with improvements
 
 ## 📝 How It Works Under the Hood
 
-This system leverages Claude Code's [subagent system](https://docs.claude.com/en/docs/claude-code/sub-agents):
+**Claude Code Subagent System:**
 
-1. **CLAUDE.md** instructs main Claude to be the orchestrator
-2. **Subagents** are defined in `.claude/agents/*.md` files
-3. **Each subagent** gets its own fresh context window
-4. **Main Claude** maintains the 200k context with todos and project state
-5. **Playwright MCP** is configured in `.mcp.json` for visual testing
+1. **CLAUDE.md** - Main Claude orchestrator instructions (200k context)
+2. **design-agent.md** - Design agent specification (parallel execution)
+3. **Each agent** gets own clean context window
+4. **Parallel execution** - 10 agents work simultaneously
+5. **Database integration** - CTAs persisted for tracking
 
-The magic happens because:
-- **Claude (200k context)** = Maintains big picture, manages todos
-- **Coder (fresh context)** = Implements one task at a time
-- **Tester (fresh context)** = Verifies one implementation at a time
-- **Stuck (fresh context)** = Handles one problem at a time with human input
-- **Each subagent** has specific tools and hardwired escalation rules
+**Why This Works:**
+- **200k context (Claude)** = Discovery + strategy + orchestration
+- **Fresh contexts (10 agents)** = Each generates 5 pages independently
+- **Parallel execution** = 50 pages 10x faster than sequential
+- **Design system** = Consistency across all pages
+- **CTA tracking** = Database integration for conversion optimization
+
+## ✅ Success Criteria
+
+✓ 20+ pages read and analyzed
+✓ 10 pillar topics generated
+✓ 50 subpillar topics documented
+✓ Design system extracted and documented
+✓ All 10 agents spawned simultaneously
+✓ 50 pages generated successfully
+✓ All CTAs stored in database
+✓ Complete documentation delivered
 
 ## 🎯 Best Practices
 
-1. **Trust Claude** - Let it create and manage the todo list
-2. **Review screenshots** - The tester provides visual proof of every implementation
-3. **Make decisions when asked** - The stuck agent needs your guidance
-4. **Don't interrupt the flow** - Let subagents complete their work
-5. **Check the todo list** - Always visible, tracks real progress
+1. **Provide good documentation** - More pages to scan = better strategy
+2. **Ensure design system is accessible** - Makes agent pages consistent
+3. **Set up database (optional)** - Better CTA tracking
+4. **Review generated pages** - Verify they match your business
+5. **Deploy and track** - Monitor CTA performance
 
 ## 🔥 Pro Tips
 
-- Use `/agents` command to see all available subagents
-- Claude maintains the todo list in its 200k context - check anytime
-- Screenshots from tester are saved and can be reviewed
-- Each subagent has specific tools - check their `.md` files
-- Subagents get fresh contexts - no context pollution!
+- The more documentation you provide, the better the strategy
+- Clear design systems = more consistent generated pages
+- Database integration enables conversion optimization
+- Generated pages are templates - customize as needed
+- Use CTA data to inform marketing strategy
 
 ## 📜 License
 
-MIT - Use it, modify it, share it!
+MIT - Use it, modify it, build amazing SEO content with it!
 
 ## 🙏 Credits
 
 Built by [Income Stream Surfer](https://www.youtube.com/incomestreamsurfers)
 
-Powered by Claude Code's agent system and Playwright MCP.
+Powered by Claude Code's agent system.
 
 ---
 
-**Ready to build something amazing?** Just run `claude` in this directory and tell it what you want to create! 🚀
+**Ready to generate 50 SEO pages in parallel?** Just run `claude` in this directory and tell it what project to analyze! 🚀
