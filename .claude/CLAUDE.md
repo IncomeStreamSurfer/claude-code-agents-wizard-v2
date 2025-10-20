@@ -83,11 +83,13 @@ When given a project to generate SEO content:
    - Show: Design system applied consistently
    - Confirm: All CTAs stored in database (if applicable)
 
-## 🛠️ The Design Agent
+## 🛠️ The SEO Designer Agent
 
 **Purpose**: Generate 5 SEO-optimized landing pages with CTAs using project design system
 
-**Invoked**: When orchestrator spawns all 10 agents (in parallel)
+**Agent Name**: `seo-designer`
+
+**Invoked**: When orchestrator spawns all 10 agents (in parallel) using Task tool
 
 **Input per agent:**
 - 5 subpillar topics to create pages for

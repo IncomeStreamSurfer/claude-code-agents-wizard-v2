@@ -31,7 +31,21 @@ This is a **Claude Code-powered SEO content generation system** that transforms 
 
 ### Installation & Setup
 
-#### Step 1: Backup Your Existing Claude Config (Important!)
+#### Step 1: Tell Claude to Protect Your Memory (FIRST!)
+
+Open Claude in your project and send this prompt:
+
+```
+> can you temporarily move your memory (claude.md) into a folder called "dontlookinhere" and start a new branch called "SEO landing pages"
+```
+
+This does two things:
+1. **Protects your existing Claude configuration** - Your `.claude/CLAUDE.md` is safely stored
+2. **Creates isolated workspace** - New branch keeps SEO work separate from your main code
+
+Claude will handle this automatically. Just wait for confirmation that it's done.
+
+#### Step 2: Backup Your Existing Claude Config (Safety Net)
 
 If you already have Claude Code set up in your project:
 
@@ -49,7 +63,7 @@ rm -rf .claude
 
 **This preserves your existing setup in case you need it later.**
 
-#### Step 2: Import This Repository
+#### Step 3: Import This Repository
 
 ```bash
 # Copy this repository's .claude directory into your project
@@ -65,7 +79,7 @@ cp .mcp.json /path/to/your/project/.mcp.json
 cd /path/to/your/project
 ```
 
-#### Step 3: Generate Your SEO Pages
+#### Step 4: Generate Your SEO Pages
 
 ```bash
 # Start Claude Code in your project directory
@@ -94,20 +108,24 @@ You: "Generate 50 SEO pages for my [SaaS/Application name]"
 ├── pages/
 └── .git/
 
-# Step 1: Backup existing Claude config (if you have one)
+# STEP 1: In Claude, send this prompt first:
+# > can you temporarily move your memory (claude.md) into a folder called "dontlookinhere" and start a new branch called "SEO landing pages"
+# [Wait for Claude to confirm]
+
+# STEP 2: Backup existing Claude config (if you have one)
 cp -r .claude ~/Desktop/.claude.backup 2>/dev/null || true
 
-# Step 2: Get the SEO generator
+# STEP 3: Get the SEO generator
 cd ~
 git clone https://github.com/IncomeStreamSurfer/claude-code-agents-wizard-v2.git
 cd claude-code-agents-wizard-v2
 git checkout design-agent
 
-# Step 3: Copy to your project
+# STEP 4: Copy to your project
 cp -r .claude /path/to/my-saas/.claude
 cp .mcp.json /path/to/my-saas/.mcp.json
 
-# Step 4: Generate SEO pages
+# STEP 5: Generate SEO pages
 cd /path/to/my-saas
 claude
 
