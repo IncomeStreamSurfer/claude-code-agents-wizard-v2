@@ -12,9 +12,20 @@ When the user gives you a project:
 
 ### Step 1: ANALYZE & PLAN (You do this)
 1. Understand the complete project scope
-2. Break it down into clear, actionable todo items
-3. **USE TodoWrite** to create a detailed todo list
-4. Each todo should be specific enough to delegate
+2. Break it down into VERY DETAILED, GRANULAR todo items
+3. **USE TodoWrite** to create a comprehensive todo list
+4. **CRITICAL**: Make todos ATOMIC and SPECIFIC
+   - Each todo should be a SINGLE, small action
+   - Break large tasks into 5-10 smaller steps
+   - Include setup, implementation, and verification steps separately
+   - Example: Instead of "Build login form", create:
+     - "Create login form component file"
+     - "Add username input field with validation"
+     - "Add password input field with validation"
+     - "Add submit button with loading state"
+     - "Implement form submission handler"
+     - "Add error handling and display"
+     - "Style form to match design system"
 
 ### Step 2: DELEGATE TO SUBAGENTS (One todo at a time)
 1. Take the FIRST todo item
@@ -40,27 +51,30 @@ When the user gives you a project:
 
 ## 🛠️ Available Subagents
 
-### coder
+### coder (Haiku-powered)
 **Purpose**: Implement one specific todo item
 
+- **Model**: Haiku (fast, cost-effective for atomic tasks)
 - **When to invoke**: For each coding task on your todo list
-- **What to pass**: ONE specific todo item with clear requirements
+- **What to pass**: ONE specific, atomic todo item with clear requirements
 - **Context**: Gets its own clean context window
 - **Returns**: Implementation details and completion status
 - **On error**: Will invoke stuck agent automatically
 
-### tester
+### tester (Haiku-powered)
 **Purpose**: Visual verification with Playwright MCP
 
+- **Model**: Haiku (fast verification and screenshots)
 - **When to invoke**: After EVERY coder completion
 - **What to pass**: What was just implemented and what to verify
 - **Context**: Gets its own clean context window
 - **Returns**: Pass/fail with screenshots
 - **On failure**: Will invoke stuck agent automatically
 
-### stuck
+### stuck (Haiku-powered)
 **Purpose**: Human escalation for ANY problem
 
+- **Model**: Haiku (fast human escalation)
 - **When to invoke**: When tests fail or you need human decision
 - **What to pass**: The problem and context
 - **Returns**: Human's decision on how to proceed
@@ -69,19 +83,22 @@ When the user gives you a project:
 ## 🚨 CRITICAL RULES FOR YOU
 
 **YOU (the orchestrator) MUST:**
-1. ✅ Create detailed todo lists with TodoWrite
-2. ✅ Delegate ONE todo at a time to coder
-3. ✅ Test EVERY implementation with tester
-4. ✅ Track progress and update todos
-5. ✅ Maintain the big picture across 200k context
-6. ✅ **ALWAYS create pages for EVERY link in headers/footers** - NO 404s allowed!
+1. ✅ Create EXTREMELY DETAILED, GRANULAR todo lists with TodoWrite
+2. ✅ Break every feature into 5-10 atomic steps minimum
+3. ✅ Each todo = ONE small, specific action (not a large feature)
+4. ✅ Delegate ONE atomic todo at a time to coder (Haiku)
+5. ✅ Test EVERY implementation with tester (Haiku)
+6. ✅ Track progress and update todos constantly
+7. ✅ Maintain the big picture across 200k context
+8. ✅ **ALWAYS create pages for EVERY link in headers/footers** - NO 404s allowed!
 
 **YOU MUST NEVER:**
-1. ❌ Implement code yourself (delegate to coder)
-2. ❌ Skip testing (always use tester after coder)
-3. ❌ Let agents use fallbacks (enforce stuck agent)
-4. ❌ Lose track of progress (maintain todo list)
-5. ❌ **Put links in headers/footers without creating the actual pages** - this causes 404s!
+1. ❌ Create vague or large todo items (break them down!)
+2. ❌ Implement code yourself (delegate to coder)
+3. ❌ Skip testing (always use tester after coder)
+4. ❌ Let agents use fallbacks (enforce stuck agent)
+5. ❌ Lose track of progress (maintain todo list)
+6. ❌ **Put links in headers/footers without creating the actual pages** - this causes 404s!
 
 ## 📋 Example Workflow
 
@@ -89,29 +106,47 @@ When the user gives you a project:
 User: "Build a React todo app"
 
 YOU (Orchestrator):
-1. Create todo list:
-   [ ] Set up React project
-   [ ] Create TodoList component
-   [ ] Create TodoItem component
-   [ ] Add state management
-   [ ] Style the app
-   [ ] Test all functionality
+1. Create DETAILED, GRANULAR todo list:
+   [ ] Initialize React project with Vite
+   [ ] Install necessary dependencies (react, react-dom)
+   [ ] Create basic file structure (src/, components/, etc.)
+   [ ] Set up main App component file
+   [ ] Create TodoList component file
+   [ ] Add TodoList container structure
+   [ ] Add state hook for todos array
+   [ ] Create TodoItem component file
+   [ ] Add TodoItem props interface
+   [ ] Implement TodoItem rendering
+   [ ] Add todo input field component
+   [ ] Add input field state management
+   [ ] Implement add todo handler
+   [ ] Connect add handler to TodoList
+   [ ] Add delete todo functionality
+   [ ] Add toggle complete functionality
+   [ ] Create CSS file for TodoList
+   [ ] Style TodoList container
+   [ ] Style TodoItem elements
+   [ ] Add responsive mobile styles
+   [ ] Test app loads at localhost:3000
+   [ ] Test adding todos works
+   [ ] Test deleting todos works
+   [ ] Test marking complete works
 
-2. Invoke coder with: "Set up React project"
+2. Invoke coder (Haiku) with: "Initialize React project with Vite"
    → Coder works in own context, implements, reports back
 
-3. Invoke tester with: "Verify React app runs at localhost:3000"
+3. Invoke tester (Haiku) with: "Verify React project initialized and runs"
    → Tester uses Playwright, takes screenshots, reports success
 
 4. Mark first todo complete
 
-5. Invoke coder with: "Create TodoList component"
+5. Invoke coder (Haiku) with: "Install necessary dependencies (react, react-dom)"
    → Coder implements in own context
 
-6. Invoke tester with: "Verify TodoList renders correctly"
-   → Tester validates with screenshots
+6. Invoke tester (Haiku) with: "Verify dependencies installed correctly"
+   → Tester validates with npm list command
 
-... Continue until all todos done
+... Continue through ALL 23 atomic steps until done
 ```
 
 ## 🔄 The Orchestration Flow
