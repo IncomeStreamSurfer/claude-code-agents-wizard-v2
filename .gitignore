@@ -1,0 +1,78 @@
+# Dependencies
+node_modules/
+/.pnp
+.pnp.js
+
+# Testing
+/coverage
+playwright-report/
+test-results/
+screenshots/
+
+# Next.js
+/.next/
+/out/
+
+# Production
+/build
+/dist
+
+# Misc
+.DS_Store
+*.pem
+
+# Debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# Environment variables
+.env
+.env*.local
+.env.production
+.env.development
+
+# Vercel
+.vercel
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Convex
+.convex/
+convex/_generated/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+logs/
+*.log
+convex-logs.txt
+nextjs-logs.txt
+
+# OS
+Thumbs.db
+
+# Temporary files
+tmp/
+temp/
+
+# Security reports
+security-audit.json
+security-report.md
+
+# Test reports
+test-report.md
+
+# Build artifacts
+*.tar.gz
+
+# Linear
+.linear/
