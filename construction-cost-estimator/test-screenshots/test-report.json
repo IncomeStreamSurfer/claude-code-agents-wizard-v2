@@ -1,0 +1,15 @@
+{
+  "timestamp": "2025-11-13T11:39:06.171Z",
+  "summary": {
+    "total": 1,
+    "passed": 0,
+    "failed": 1
+  },
+  "tests": [
+    {
+      "name": "Test execution",
+      "status": "FAIL",
+      "details": "page.screenshot: Target crashed \nCall log:\n  - taking page screenshot\n  - waiting for fonts to load...\n  - fonts loaded\n"
+    }
+  ]
+}

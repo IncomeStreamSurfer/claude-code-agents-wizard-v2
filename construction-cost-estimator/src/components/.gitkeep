@@ -1,0 +1,3 @@
+# This directory will contain React components
+# UI components from shadcn/ui will be added here
+# Custom components: PDFViewer, AnnotationLayer, CostItemList, etc.
