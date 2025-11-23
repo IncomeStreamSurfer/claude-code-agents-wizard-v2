@@ -1,3 +1,5 @@
+Join the Skool - https://www.skool.com/iss-ai-automation-school-6342/about
+
 # Claude Code Agent Orchestration System v2 🚀
 
 A simple yet powerful orchestration system for Claude Code that uses specialized agents to manage complex projects from start to finish, with mandatory human oversight and visual testing.
