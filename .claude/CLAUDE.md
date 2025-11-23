@@ -102,7 +102,77 @@ When a user says "Make me a directory about X":
    - Set up dynamic routing
    - Implement search/filter functionality
 
-### Step 6: GITHUB DEPLOYMENT
+### Step 6: PLAYWRIGHT TESTING & VALIDATION
+
+**CRITICAL: Test the site before deploying!**
+
+**You handle orchestration (no separate background job needed):**
+
+1. **Start NextJS dev server in background**
+   ```bash
+   cd [project-directory]
+   npm run dev &
+   # Note the PID for later cleanup
+   ```
+
+2. **Wait for server to be ready**
+   ```bash
+   # Wait until localhost:3000 responds
+   sleep 5
+   curl http://localhost:3000 || sleep 5
+   ```
+
+3. **Invoke playwright-tester agent** with:
+   - Project directory path
+   - Expected page counts (items, categories, tags)
+   - List of sample URLs to test
+
+4. **Monitor BOTH logs simultaneously:**
+   - **Browser logs**: Playwright captures console errors, 404s, broken links
+   - **Server logs**: You monitor the dev server output for build errors, API errors
+
+5. **Playwright-tester agent will:**
+   - Install Playwright if needed
+   - Create comprehensive test suite
+   - Test all page types (homepage, items, categories, tags, search)
+   - Validate SEO meta tags on all pages
+   - Check for 404 errors
+   - Test navigation and links
+   - Verify mobile responsiveness
+   - Capture browser console errors
+   - Generate test report
+
+6. **Review test results:**
+   - If all tests pass → Continue to GitHub deployment
+   - If tests fail → Report errors to user, ask if they want to:
+     - Fix errors manually and re-test
+     - Deploy anyway (not recommended)
+     - Cancel deployment
+
+7. **Cleanup: Kill dev server**
+   ```bash
+   kill [PID]
+   ```
+
+**Example of monitoring both:**
+```
+Terminal 1 (Server Logs):
+  npm run dev
+  > ready - started server on 0.0.0.0:3000
+  > compiled successfully
+  > GET / 200 in 45ms
+  > GET /wework-soho 200 in 23ms
+
+Terminal 2 (Playwright Tests):
+  npx playwright test
+  ✅ Homepage loads and displays items
+  ✅ All individual item pages load without 404s
+  ✅ All category pages load with correct filtering
+  ✅ All tag pages load with correct filtering
+  ⚠️ Found 1 console error on /some-page
+```
+
+### Step 7: GITHUB DEPLOYMENT
 
 **You handle this directly (no separate agent needed):**
 
@@ -252,6 +322,25 @@ When a user says "Make me a directory about X":
 - Component styles
 - File saved to `/design/index.html`
 
+### playwright-tester
+
+**Purpose**: Validate the built NextJS site for errors, 404s, and functionality
+
+**Invoked**: After NextJS build complete (Step 6) using Task tool
+
+**Input:**
+- Project directory path
+- Expected page counts (items, categories, tags)
+- Sample URLs to test
+
+**Output:**
+- Comprehensive test report
+- List of all errors found (404s, console errors, broken links)
+- SEO validation results
+- Performance metrics
+- Pass/fail status for deployment
+- Recommendations for fixes
+
 ## 📋 Example Workflow
 
 ```
@@ -309,13 +398,36 @@ You invoke nextjs-builder agent:
   * Search and filter functionality
   * Responsive design
 
-STEP 6: GITHUB PUSH
-You invoke github-pusher agent:
-- Agent creates repo "irish-heritage-sites"
-- Pushes all code
+STEP 6: TESTING & VALIDATION
+You start dev server in background:
+- npm run dev &
+- Wait for server ready
+
+You invoke playwright-tester agent:
+- Tests all 92 pages (homepage + 50 items + 10 categories + 31 tags)
+- Checks for 404 errors
+- Validates SEO meta tags
+- Tests navigation and links
+- Captures console errors
+- Verifies mobile responsiveness
+
+Results:
+✅ All tests passed
+✅ No 404 errors
+✅ No console errors
+✅ All SEO tags present
+✅ Ready for deployment
+
+You kill dev server
+
+STEP 7: GITHUB PUSH
+You initialize git and push:
+- git init && git add -A
+- git commit -m "..."
+- gh repo create irish-heritage-sites --public --source=. --push
 - Returns: https://github.com/username/irish-heritage-sites
 
-STEP 7: REPORT
+STEP 8: REPORT
 You: "✅ Complete! Your Irish heritage sites directory is ready:
 - 50 heritage sites researched and documented
 - Comprehensive data with 40+ fields per site
@@ -354,13 +466,24 @@ YOU: Invoke nextjs-builder agent with design + data
     ↓
 NEXTJS AGENT: Build complete directory website
     ↓
-YOU: Invoke github-pusher agent
+YOU: Start dev server in background (npm run dev &)
     ↓
-GITHUB AGENT: Push to GitHub and return URL
+YOU: Invoke playwright-tester agent
+    ↓
+PLAYWRIGHT AGENT: Test all pages, validate SEO, check for errors
+    ↓
+YOU: Monitor server logs + browser logs simultaneously
+    ↓
+    ├─→ Tests PASS → Continue to deployment
+    └─→ Tests FAIL → Report errors, ask user to fix or deploy anyway
+    ↓
+YOU: Kill dev server
+    ↓
+YOU: Push to GitHub (git init, commit, push)
     ↓
 YOU: Report complete results to user
     ↓
-USER: Has complete directory website ready to deploy
+USER: Has complete, tested directory website ready to deploy
 ```
 
 ## 🎯 Why This Works
