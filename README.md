@@ -1,24 +1,26 @@
-# Claude Code Directory Builder System 🚀
+# Claude Code Service Website Generator 🚀
 
-**One-Shot Directory Website Generator**: From topic to deployed website in one automated workflow.
+**One-Shot Service Website Builder**: From service niche to deployed website with hundreds of local SEO pages in one automated workflow.
 
-Turn any topic into a complete, SEO-optimized directory website with just a topic name and a Jina API key. The system automatically researches, designs, builds, and deploys a full NextJS directory with 50-100+ pages optimized for Google.
+Turn any service business into a complete, SEO-optimized service website with just a service niche, service area, and Jina API key. The system automatically discovers locations, researches services, generates 200-500+ service+location pages with Unsplash images, and deploys a full NextJS website optimized for local SEO and Google rankings.
 
 ## 🎯 What Does This Do?
 
 Give it:
-- **A topic** ("Irish heritage sites", "Coworking spaces in London", "Best coffee shops in NYC")
-- **Jina API key** (for web research)
+- **A service niche** ("Plumber", "Electrician", "Carpet Cleaning", "HVAC", "Roofing")
+- **A service area** ("Galway, Ireland", "Austin, Texas", "Manchester, UK")
+- **Jina API key** (for location research, service research, and Unsplash image scraping)
 - **HTML/CSS/JS design** (optional - it'll generate one if you don't have it)
 
 Get:
-- **Complete NextJS directory website**
-- **50-100+ SEO-optimized pages** (homepage, category pages, tag pages, individual item pages)
-- **Comprehensive data** researched from real sources
-- **Clickbait titles** optimized for Google ("Best X in Y", "Everything You Need to Know")
-- **Dynamic routing** for all pages
-- **Search & filter functionality**
-- **Responsive design**
+- **Complete NextJS service website**
+- **200-500+ SEO-optimized pages** (homepage, service pages, location pages, service+location combinations)
+- **Real Unsplash images** on every page (3-5 per page)
+- **Comprehensive local SEO** for every service in every location
+- **Clickbait titles** optimized for Google ("Emergency Plumber Athenry - 24/7 Fast Response")
+- **Dynamic routing** for all service+location combinations
+- **Click-to-call functionality** and trust signals
+- **Responsive design** with strong CTAs
 - **Ready to deploy** to Vercel, Digital Ocean, Netlify, etc.
 
 ## ⚡ Quick Start
@@ -37,8 +39,8 @@ Get:
 git clone https://github.com/IncomeStreamSurfer/claude-code-agents-wizard-v2.git
 cd claude-code-agents-wizard-v2
 
-# Checkout the directory-builder branch
-git checkout directory-builder-system
+# Checkout the service-website-generator branch
+git checkout service-website-generator
 
 # Start Claude Code in this directory
 claude
@@ -49,53 +51,62 @@ claude
 Once Claude Code is running in this directory:
 
 ```
-You: "Make me a directory about [YOUR TOPIC]"
+You: "Make me a service website for [SERVICE NICHE] in [SERVICE AREA]"
 ```
 
 **Claude will ask you for:**
-1. **Jina API Key** - For researching and scraping data
-2. **Number of items** - How many directory entries (default: 50)
-3. **HTML/CSS/JS design** - Provide your own OR let the system generate one
+1. **Service Niche** - What service business (e.g., "Plumber", "Electrician")
+2. **Service Area** - Main city/region (e.g., "Galway, Ireland", "Austin, Texas")
+3. **Jina API Key** - For location research, service research, and Unsplash images
+4. **HTML/CSS/JS design** - Provide your own OR let the system generate one
 
 **Then Claude automatically:**
 1. Generates/saves design (if needed)
-2. Researches topic and creates comprehensive JSON schema
-3. Spawns 10+ parallel agents to research and create all data
-4. Builds complete NextJS website with SEO optimization
-5. Pushes to GitHub
-6. Gives you deployment instructions
+2. Discovers 20-50+ locations within service radius
+3. Researches service niche and creates 5-15 common services
+4. Spawns 20-30 parallel agents to generate all service+location pages with Unsplash images
+5. Builds complete NextJS website with local SEO optimization
+6. Tests with Playwright
+7. Pushes to GitHub
+8. Gives you deployment instructions
 
 ## 📖 Example Session
 
 ```
-You: "Make me a directory about Irish heritage sites"
+You: "Make me a service website for plumbers in Galway"
 
-Claude: "Great! I'll help you build a directory about Irish heritage sites. I need:
-1. ✅ Topic: Irish heritage sites
-2. ❓ What's your Jina API key?
-3. ❓ Do you have HTML/CSS/JS design code, or should I generate one?"
+Claude: "Great! I'll help you build a service website for plumbers in Galway. I need:
+1. ✅ Service Niche: Plumber
+2. ✅ Service Area: Galway, Ireland
+3. ❓ What's your Jina API key?
+4. ❓ Do you have HTML/CSS/JS design code, or should I generate one?"
 
 You: "Here's my Jina key: jina_xxxxx. Generate a design for me."
 
-Claude: "Perfect! How many heritage sites do you want in the directory? (Default: 50)"
-
-You: "50 sites"
-
 Claude:
-✅ Generating design...
-✅ Creating schema from research...
-✅ Spawning 10 data agents in parallel...
+✅ Generating service-focused design...
+✅ Discovering locations in Galway area (50km radius)...
+✅ Found 30 locations: Athenry, Oranmore, Loughrea, Tuam, etc.
+✅ Researching plumbing services...
+✅ Found 10 common services: Emergency Plumbing, Bathroom Installation, Drain Cleaning, etc.
+✅ Calculating pages: 10 services × 30 locations = 300 pages
+✅ Spawning 25 page generator agents in parallel...
+✅ Scraping Unsplash for images via Jina...
 ✅ Building NextJS website...
+✅ Testing with Playwright...
 ✅ Pushing to GitHub...
 
-COMPLETE! Your Irish heritage sites directory is ready:
-- 50 heritage sites researched
-- 92 total pages generated:
-  * 1 homepage
-  * 50 individual site pages
-  * 10 category pages ("Best Castles in Ireland")
-  * 31 tag pages ("Top Family-Friendly Sites")
-- GitHub: https://github.com/you/irish-heritage-sites
+COMPLETE! Your plumbing service website is ready:
+- 300 service+location pages generated
+- 10 services covered
+- 30 locations covered in Galway area
+- All pages with 3-5 Unsplash images
+- 350+ total pages including main pages
+- All optimized for local SEO:
+  * "Emergency Plumber Athenry - 24/7 Fast Response"
+  * "Bathroom Installation Oranmore - Free Quote"
+  * "Drain Cleaning Loughrea - Same Day Service"
+- GitHub: https://github.com/you/plumber-galway
 - Deploy: vercel deploy or push to Digital Ocean
 ```
 
@@ -104,82 +115,102 @@ COMPLETE! Your Irish heritage sites directory is ready:
 ### The Automated Workflow
 
 ```
-USER INPUT → DESIGN → SCHEMA → DATA (PARALLEL) → NEXTJS → GITHUB
+USER INPUT → DESIGN → LOCATIONS → SERVICES → PAGES (PARALLEL + UNSPLASH) → NEXTJS → TEST → GITHUB
 ```
 
 **Step 1: Design Generation (if needed)**
-- `design-generator` agent creates HTML/CSS/JS design
+- `design-generator` agent creates service-focused HTML/CSS/JS design
+- Includes trust signals, testimonials, CTAs, click-to-call
 - Or uses your provided design
 
-**Step 2: Schema Creation**
-- `schema-creator` agent researches 5-7 real examples
-- Creates comprehensive JSON schema (40+ fields)
-- Populates 3-5 example items
+**Step 2: Location Discovery**
+- `location-generator` agent researches service area
+- Discovers 20-50+ locations within appropriate radius
+- Uses logic: Ireland/UK = 50km, US = 30 miles, adjusts for service type
+- Creates comprehensive locations list
 
-**Step 3: Parallel Data Generation**
-- Spawns N `data-generator` agents simultaneously
-- Each agent researches and creates 5 items
-- 10 agents = 50 items in parallel (10x faster!)
+**Step 3: Service Schema Creation**
+- `service-schema-creator` agent researches service niche
+- Identifies 5-15 common services (e.g., for plumbers: Emergency, Bathroom Installation, Drain Cleaning, etc.)
+- Creates comprehensive JSON schema for service pages
+- Includes fields for: descriptions, benefits, process, FAQs, images, SEO
 
-**Step 4: NextJS Website Build**
+**Step 4: Parallel Page Generation with Unsplash**
+- Spawns N `service-page-generator` agents simultaneously
+- Each agent creates 10-15 service+location page combinations
+- 10 services × 30 locations = 300 pages = 25 agents in parallel
+- **Each agent scrapes Unsplash via Jina for 3-5 images per page**
+- All pages get unique content optimized for local SEO
+
+**Step 5: NextJS Website Build**
 - `nextjs-builder` agent creates complete site
 - **SEO-OPTIMIZED pages:**
-  - Homepage with search
-  - Individual page for EVERY item
-  - Category page for EVERY category ("Best X in Y")
-  - Tag page for EVERY unique tag ("Top Z Sites")
-  - Search page with filters
+  - Homepage with service overview
+  - Main services page
+  - Main locations page
+  - Individual service+location pages (300+)
+  - Service category pages
+  - Location pages
 - All pages have clickbait meta titles/descriptions
+- Click-to-call buttons throughout
+- Trust signals and strong CTAs
 - Sitemap with all pages
 - Schema.org markup
 - Dynamic routing
 
-**Step 5: GitHub Deployment**
+**Step 6: Playwright Testing**
+- Tests all page types for errors
+- Validates local SEO meta tags
+- Checks Unsplash images load correctly
+- Tests click-to-call functionality
+- Verifies mobile responsiveness
+
+**Step 7: GitHub Deployment**
 - Orchestrator pushes to GitHub
 - Returns repository URL
 - Provides deployment instructions
 
 ## 🎨 SEO Features (The Whole Point!)
 
-### Every Directory Gets 90-150+ Pages
+### Every Service Website Gets 200-500+ Pages
 
-**Example: 50 heritage sites with 30 unique tags and 8 categories:**
+**Example: Plumber in Galway with 10 services and 30 locations:**
 - 1 homepage
-- 50 individual item pages
-- 8 category pages
-- 30 tag pages
-- 1 search page
-- **Total: 90 pages** all optimized for Google
+- 1 main services page
+- 1 main locations page
+- 10 service category pages
+- 30 location pages
+- 300 service+location combination pages
+- **Total: 343 pages** all optimized for local SEO
 
 ### Clickbait Titles for Google Rankings
 
-**Individual Pages:**
-- "Kilkenny Castle - Everything You Need to Know | Heritage Guide"
-- "Rock of Cashel Complete Guide - Hours, Tickets & Best Time"
-- "Blarney Castle 2025: Skip the Line Tickets, Map & Tips"
+**Service+Location Pages (Target "Service in Location"):**
+- "Emergency Plumber Athenry - 24/7 Fast Response | Call Now"
+- "Bathroom Installation Galway - Transform Your Bathroom | Free Quote"
+- "Drain Cleaning Oranmore - Same Day Service Available"
 
-**Category Pages (Target "Best X in Y"):**
-- "Best Castles in Ireland - Top 25 Castles to Visit in 2025"
-- "Best National Parks in Ireland - Complete Guide with Maps"
-- "Best Historic Houses in Ireland - 15 Must-See Estates"
+**Service Category Pages:**
+- "Emergency Plumbing Services in Galway - 24/7 Response"
+- "Bathroom Installation Services - Expert Fitters Across Galway"
 
-**Tag Pages (Target Long-Tail Keywords):**
-- "Top Family-Friendly Heritage Sites - 32 Amazing Options"
-- "Medieval Castles in Ireland - Complete Guide to 18 Sites"
-- "Free Heritage Sites in Ireland - 12 Free Attractions"
+**Location Pages:**
+- "Plumbing Services in Athenry - All Plumbing Needs Covered"
+- "Local Plumbers Serving Oranmore - Fast, Reliable Service"
 
-### Complete SEO Implementation
+### Complete Local SEO Implementation
 
-- ✅ Unique meta title for every page
+- ✅ Unique meta title for every page with location
 - ✅ Compelling meta description for every page
+- ✅ Location mentioned 3-5 times in page content
+- ✅ Service-specific keywords throughout
 - ✅ Sitemap.xml with all pages
 - ✅ robots.txt
-- ✅ Schema.org JSON-LD markup
+- ✅ Schema.org JSON-LD markup for local business
 - ✅ Open Graph tags
-- ✅ Semantic HTML
-- ✅ Internal linking
-- ✅ Image alt text
-- ✅ Proper heading hierarchy
+- ✅ Click-to-call buttons
+- ✅ Trust signals (qualifications, guarantees, years experience)
+- ✅ Real Unsplash images (3-5 per page)
 
 ## 🛠️ The Agent System
 
@@ -187,197 +218,90 @@ USER INPUT → DESIGN → SCHEMA → DATA (PARALLEL) → NEXTJS → GITHUB
 - Collects user inputs
 - Coordinates all agents
 - Manages workflow
-- Handles GitHub deployment
+- Handles testing and GitHub deployment
 
 ### design-generator
-- Creates HTML/CSS/JS design
+- Creates service-focused HTML/CSS/JS design
 - Tailwind CSS based
-- Responsive and beautiful
-- Topic-appropriate aesthetics
+- Includes trust signals, CTAs, click-to-call
+- Service-business optimized
 
-### schema-creator
-- Researches topic with Jina
-- Creates comprehensive schema
-- Populates example data
-- 40+ fields per item
+### location-generator
+- Discovers locations in service area
+- Uses appropriate radius (50km for Ireland, 30 miles for US, etc.)
+- Finds 20-50+ towns, cities, suburbs, neighborhoods
+- Creates comprehensive locations list with metadata
 
-### data-generator (Parallel Agents)
-- Spawned 10+ at once
-- Each creates 5 items
-- Uses Jina for research
+### service-schema-creator
+- Researches service niche
+- Identifies 5-15 common services
+- Creates comprehensive page schema
+- Defines content structure for all pages
+
+### service-page-generator (Parallel Agents)
+- Spawned 20-30 at once
+- Each creates 10-15 service+location pages
+- **Scrapes Unsplash via Jina** for 3-5 images per page
+- Generates unique, location-specific content
 - Follows schema exactly
 - Real, comprehensive data
 
 ### nextjs-builder
 - Converts design to NextJS
 - Generates ALL pages
-- SEO optimization
+- Local SEO optimization
 - Dynamic routing
-- Search/filter
+- Click-to-call functionality
+- Trust signals and CTAs
 - Responsive
 - Production-ready
 
-## 📁 Output Structure & Data Storage
+### playwright-tester
+- Tests all page types
+- Validates local SEO
+- Checks Unsplash images load
+- Tests click-to-call buttons
+- Verifies mobile responsiveness
+- Reports errors and issues
 
-### Where Your Data Lives
-
-**All directory data is stored as JSON files:**
+## 📁 Output Structure
 
 ```
-your-directory-site/
+your-service-site/
 ├── app/
-│   ├── page.tsx (Homepage - displays ALL items)
-│   ├── [slug]/page.tsx (Individual item pages - reads one JSON file each)
-│   ├── category/[category]/page.tsx (Category pages - filters JSON by category)
-│   ├── tag/[tag]/page.tsx (Tag pages - filters JSON by tag)
-│   ├── search/page.tsx (Search page - searches across all JSON)
-│   ├── layout.tsx (Layout with header/footer)
-│   └── sitemap.ts (Dynamic sitemap - lists all JSON files as pages)
+│   ├── page.tsx (Homepage)
+│   ├── services/page.tsx (Main services page)
+│   ├── locations/page.tsx (Main locations page)
+│   ├── [service-slug]/page.tsx (Service category pages)
+│   ├── [location-slug]/page.tsx (Location pages)
+│   ├── [service-slug]-[location-slug]/page.tsx (Service+location pages - 300+)
+│   ├── layout.tsx (Layout with header/footer, click-to-call)
+│   └── sitemap.ts (Dynamic sitemap)
 ├── components/
-│   ├── Header.tsx
+│   ├── Header.tsx (with click-to-call button)
 │   ├── Footer.tsx
-│   ├── ItemCard.tsx
-│   └── SearchBar.tsx
+│   ├── ServiceCard.tsx
+│   ├── LocationCard.tsx
+│   ├── TrustSignals.tsx
+│   └── CTAButton.tsx
 ├── lib/
-│   ├── data.ts (Reads ALL JSON files from /public/sites/)
-│   └── seo.ts (SEO utilities)
+│   ├── data.ts (Reads ALL JSON files from /public/pages/)
+│   └── seo.ts (Local SEO utilities)
 ├── public/
-│   └── sites/                    ← YOUR DATA STORED HERE
-│       ├── item-1.json           (50 JSON files)
-│       ├── item-2.json
-│       ├── item-3.json
-│       └── ... (47 more files)
+│   └── pages/                    ← YOUR DATA STORED HERE
+│       ├── emergency-plumber-athenry.json
+│       ├── emergency-plumber-oranmore.json
+│       ├── bathroom-installation-athenry.json
+│       └── ... (300 JSON files)
 ├── package.json
 └── next.config.js
 ```
-
-### How Data is Used
-
-**1. JSON files = Source of Truth**
-- All your directory data lives in `/public/sites/*.json`
-- Each JSON file = one item in your directory
-- Files follow the schema created by `schema-creator` agent
-
-**2. NextJS reads files at build time**
-```typescript
-// lib/data.ts reads ALL JSON files
-export function getAllItems() {
-  const sitesDirectory = path.join(process.cwd(), 'public/sites');
-  const filenames = fs.readdirSync(sitesDirectory);
-
-  return filenames.map(filename => {
-    const fileContents = fs.readFileSync(path.join(sitesDirectory, filename), 'utf8');
-    return JSON.parse(fileContents);
-  });
-}
-```
-
-**3. Pages are generated dynamically from JSON**
-- **Homepage**: Shows all 50 items (reads all JSON files)
-- **Individual pages**: Shows one item each (reads one JSON file)
-- **Category pages**: Shows items filtered by category
-- **Tag pages**: Shows items filtered by tags
-
-**4. Categories and Tags are extracted automatically**
-```typescript
-// System reads all JSON files and extracts unique values
-export function getAllCategories() {
-  const items = getAllItems();
-  const categories = new Set();
-  items.forEach(item => {
-    item.categories.forEach(cat => categories.add(cat));
-  });
-  return Array.from(categories);
-  // Example: ["castles", "parks", "abbeys", "museums"]
-}
-
-export function getAllTags() {
-  const items = getAllItems();
-  const tags = new Set();
-  items.forEach(item => {
-    item.tags.forEach(tag => tags.add(tag));
-  });
-  return Array.from(tags);
-  // Example: ["family-friendly", "free-admission", "medieval", "outdoor", etc.]
-}
-```
-
-### 🔄 Adding More Items Later (Easy!)
-
-**Want to add more items after the initial build?**
-
-**Option 1: Add JSON files manually**
-```bash
-# Just add a new JSON file to /public/sites/
-# Make sure it follows the same schema
-
-/public/sites/new-item.json
-```
-
-**Option 2: Run the system again**
-```
-You: "Add 20 more items to my directory"
-
-Claude:
-- Reads existing schema
-- Spawns 4 data-generator agents (20 ÷ 5 = 4)
-- Creates 20 new JSON files in /public/sites/
-- You now have 70 items total
-```
-
-**Then rebuild:**
-```bash
-npm run build
-```
-
-**What happens automatically:**
-- Homepage now shows 70 items (was 50)
-- 20 new individual item pages created
-- If new categories exist → new category pages created
-- If new tags exist → new tag pages created
-- Sitemap updated with all new pages
-- All pages regenerated with new data
-
-**Example:**
-- Started with: 50 items = 90 pages
-- Added: 20 items with 5 new tags
-- Now have: 70 items = 115 pages (homepage + 70 items + categories + 45 tags)
-
-### 📊 Data Flow
-
-```
-JSON FILES (Source of Truth)
-    ↓
-NextJS Build Process
-    ↓
-Reads all /public/sites/*.json
-    ↓
-Extracts categories and tags
-    ↓
-Generates Static Pages:
-├── Homepage (all items)
-├── Individual pages (one per JSON file)
-├── Category pages (filtered by category)
-└── Tag pages (filtered by tag)
-    ↓
-User visits site → Super fast static pages
-```
-
-### 🎯 Key Benefits
-
-1. **JSON = Database**: No need for actual database, JSON files are your data store
-2. **Easy to edit**: Just edit JSON files directly to update content
-3. **Version control**: All data is in git, easy to track changes
-4. **Portable**: Move your entire directory by copying JSON files
-5. **Scalable**: Add as many JSON files as you want
-6. **Static = Fast**: Pre-generated pages load instantly
-7. **SEO-friendly**: All content is in HTML at build time
 
 ## 🚢 Deployment Options
 
 ### Vercel (Easiest)
 ```bash
-cd your-directory-site
+cd your-service-site
 vercel deploy
 ```
 
@@ -389,42 +313,34 @@ vercel deploy
 
 ### Netlify
 ```bash
-cd your-directory-site
+cd your-service-site
 netlify deploy
-```
-
-### Traditional Hosting
-```bash
-npm run build
-# Upload .next/out folder to hosting
 ```
 
 ## 💡 Use Cases
 
-**Tourism & Travel:**
-- Heritage sites directory
-- Hotel/accommodation listings
-- Restaurant guides
-- Tourist attraction catalogs
-- City guides
+**Home Services:**
+- Plumbing services
+- Electrical services
+- HVAC companies
+- Roofing contractors
+- Landscaping services
+- Cleaning services
+- Handyman services
 
-**Business:**
-- Coworking space directories
-- Office space listings
-- Business service providers
-- Consultant directories
+**Professional Services:**
+- Legal services
+- Accounting services
+- Real estate agents
+- Insurance agents
+- Financial advisors
 
-**Local:**
-- Coffee shop guides
-- Bar/nightlife directories
-- Shopping directories
-- Service provider lists
-
-**Niche:**
-- Equipment rental catalogs
-- Event venue directories
-- Course/class listings
-- Tool/resource directories
+**Specialty Services:**
+- Pest control
+- Pool services
+- Locksmith services
+- Appliance repair
+- Auto repair
 
 ## 🎓 Why This Works
 
@@ -441,47 +357,55 @@ npm run build
 - Expert-level output
 
 **Parallel Execution:**
-- 10 agents creating 5 items each
-- 50 items in parallel
-- 10x faster than sequential
+- 25 agents creating 12 pages each
+- 300 pages in parallel
+- 25x faster than sequential
 - Scales to any size
 
-**SEO-First Approach:**
-- Every page optimized
+**Local SEO-First Approach:**
+- Every page optimized for "service + location"
+- Hundreds of keyword combinations
 - Clickbait titles
-- Meta descriptions
+- Real Unsplash images
 - Comprehensive coverage
-- Ranks on Google
+- Ranks on Google for local searches
+
+**Unsplash Integration:**
+- Real, high-quality images on every page
+- Scraped automatically via Jina
+- Proper attribution
+- Professional appearance
+- Builds trust with visitors
 
 ## 🔥 Pro Tips
 
-1. **More items = More pages = More traffic**
-   - 50 items → 90+ pages
-   - 100 items → 150+ pages
+1. **More locations = More pages = More traffic**
+   - 20 locations × 10 services = 200 pages
+   - 50 locations × 10 services = 500 pages
    - More pages = more chances to rank
 
 2. **Let it generate the design**
    - Unless you have specific branding
-   - Generated designs are beautiful
-   - Optimized for conversion
+   - Generated designs are service-focused
+   - Optimized for conversions
 
-3. **Use descriptive topics**
-   - "Irish heritage sites" ✅
-   - "Heritage sites" ❌ (too vague)
+3. **Use specific service areas**
+   - "Plumber in Galway" ✅
+   - "Plumber" ❌ (too vague)
 
 4. **Deploy immediately**
    - Get it live and start ranking
    - Iterate and improve later
 
-5. **Add more data over time**
-   - Run the system again with more items
-   - Merge with existing site
+5. **Target multiple service types**
+   - Run the system for different services
+   - Build multiple sites for different niches
 
 ## 🤝 Contributing
 
 This is an open system! Improvements welcome:
-- Better SEO strategies
-- New page types
+- Better local SEO strategies
+- New service types
 - Design templates
 - Agent optimizations
 
@@ -497,15 +421,16 @@ Part of the Claude Code Agent Orchestration System v2.
 
 Powered by:
 - Claude Code's agent system
-- Jina AI for research
+- Jina AI for research and Unsplash scraping
+- Unsplash for high-quality images
 - Next.js for blazing fast sites
 - Tailwind CSS for beautiful designs
 
 ---
 
-**Ready to build a directory?** Just run `claude` in this directory and say:
+**Ready to build a service website?** Just run `claude` in this directory and say:
 ```
-"Make me a directory about [YOUR TOPIC]"
+"Make me a service website for [SERVICE] in [CITY]"
 ```
 
-🚀 From topic to deployed website in one shot!
+🚀 From service niche to deployed website with 300+ local SEO pages in one shot!
