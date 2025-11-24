@@ -132,6 +132,13 @@ Look for:
 - Photographer names (for attribution)
 - Image IDs
 
+**CRITICAL: Avoid Unsplash+ Premium Images**
+- Look for "Plus" or "Premium" badges in image data
+- Only use images that are FREE
+- Check for any pricing indicators
+- Skip any images marked as "Unsplash+"
+- Unsplash+ images require payment and cannot be used freely
+
 **4. Select 4-6 appropriate images:**
 - 1 hero image (main, high-quality, relevant)
 - 3-5 gallery images (supporting, showing different aspects)

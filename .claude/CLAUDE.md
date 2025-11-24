@@ -15,8 +15,11 @@ When a user says "Make me a service website for X":
 **Ask the user for:**
 1. **Service Niche**: What service business is this for? (e.g., "Plumber", "Electrician", "Carpet Cleaning", "HVAC", "Roofing")
 2. **Service Area**: Main city/region to target (e.g., "Galway, Ireland", "Austin, Texas", "Manchester, UK")
-3. **Jina API Key**: Required for web scraping, research, and Unsplash image gathering
-4. **HTML/CSS/JS Design** (OPTIONAL):
+3. **Business Name** (OPTIONAL): Specific business name for personalization (e.g., "Murphy's Plumbing Services")
+   - If they provide a business name, tell them: "Great! I'll research your business to personalize the website."
+   - If they don't, tell them: "No problem! I'll create professional generic content."
+4. **Jina API Key**: Required for web scraping, research, and Unsplash image gathering
+5. **HTML/CSS/JS Design** (OPTIONAL):
    - If they provide design code, use it
    - If they don't provide design, tell them: "No problem! The system will generate a design for you."
 
@@ -25,8 +28,33 @@ When a user says "Make me a service website for X":
 - ✅ Service area (city/region)
 - ✅ Jina API key
 - ✅ Confirmation on design (either they provided it OR they want system to generate)
+- ✅ Business name (or confirmed they want generic)
 
-### Step 1: DESIGN GENERATION (If needed)
+### Step 1: BUSINESS RESEARCH (If business name provided)
+
+**If user PROVIDED a business name:**
+1. **Invoke business-researcher agent** with:
+   - Business name
+   - Service niche
+   - Service area
+   - Jina API key
+
+2. Agent will:
+   - Research business across multiple sources
+   - Scrape official website (if available)
+   - Gather real reviews and testimonials
+   - Verify qualifications and certifications
+   - Collect company history and background
+   - Identify unique selling points
+   - Save to `/business-profile.json`
+
+3. **You review the profile** and confirm it looks accurate
+
+**If user did NOT provide business name:**
+1. Skip this step
+2. Website will use professional generic content
+
+### Step 2: DESIGN GENERATION (If needed)
 
 **If user did NOT provide HTML/CSS/JS:**
 1. **Invoke design-generator agent** with the service niche
@@ -37,7 +65,7 @@ When a user says "Make me a service website for X":
 1. Save their design to `/design/index.html`
 2. Extract design patterns for later use
 
-### Step 2: LOCATION DISCOVERY (Critical for Local SEO)
+### Step 3: LOCATION DISCOVERY (Critical for Local SEO)
 
 1. **Invoke location-generator agent** with:
    - Service area (main city/region)
@@ -53,7 +81,7 @@ When a user says "Make me a service website for X":
 
 3. **You review the locations** list and confirm coverage
 
-### Step 3: SERVICE SCHEMA CREATION
+### Step 4: SERVICE SCHEMA CREATION
 
 1. **Invoke service-schema-creator agent** with:
    - Service niche
@@ -68,7 +96,32 @@ When a user says "Make me a service website for X":
 
 3. **You review the schema** and confirm it's comprehensive
 
-### Step 4: PAGE GENERATION STRATEGY (You do this)
+### Step 5: DATABASE SETUP
+
+1. **Invoke database-agent** with:
+   - Project directory path
+   - Service niche (for context on forms/data)
+   - Service area
+   - Suggested database name
+
+2. Agent will:
+   - Check for/install doctl CLI
+   - Set up local PostgreSQL (Docker or native)
+   - Provision Digital Ocean Managed PostgreSQL
+   - Configure Prisma ORM with comprehensive schema
+   - Create database tables (ContactForm, QuoteRequest, CallbackRequest, etc.)
+   - Set up API routes for form submissions
+   - Create helper functions
+   - Configure environment variables
+   - Document database setup
+
+3. **You verify database is ready**
+   - Local database running
+   - Production database provisioned
+   - Prisma configured
+   - API routes created
+
+### Step 6: PAGE GENERATION STRATEGY (You do this)
 
 1. **Calculate total pages needed**
    - Total pages = Services × Locations
@@ -87,7 +140,7 @@ When a user says "Make me a service website for X":
    - Service niche context
    - Number of pages per agent (10-15)
 
-### Step 5: SPAWN SERVICE PAGE GENERATORS IN PARALLEL (Critical)
+### Step 7: SPAWN SERVICE PAGE GENERATORS IN PARALLEL (Critical)
 
 1. **Spawn N service-page-generator agents SIMULTANEOUSLY**
    - All agents work in parallel (not sequential!)
@@ -114,7 +167,7 @@ When a user says "Make me a service website for X":
    - Confirm all pages have images from Unsplash
    - Confirm data quality and schema compliance
 
-### Step 6: NEXTJS SITE BUILD
+### Step 8: NEXTJS SITE BUILD
 
 1. **Invoke nextjs-builder agent** with:
    - HTML/CSS/JS design (from Step 1)
@@ -137,7 +190,7 @@ When a user says "Make me a service website for X":
    - Add strong CTAs (call buttons, contact forms)
    - Implement click-to-call functionality
 
-### Step 7: PLAYWRIGHT TESTING & VALIDATION
+### Step 9: PLAYWRIGHT TESTING & VALIDATION
 
 **CRITICAL: Test the site before deploying!**
 
@@ -209,7 +262,7 @@ Terminal 2 (Playwright Tests):
   ⚠️ Found 1 console error on /some-page
 ```
 
-### Step 8: GITHUB DEPLOYMENT
+### Step 10: GITHUB DEPLOYMENT
 
 **You handle this directly (no separate agent needed):**
 
@@ -261,7 +314,7 @@ Terminal 2 (Playwright Tests):
 
 5. **Return repository URL** to user
 
-### Step 9: COLLECT & REPORT
+### Step 11: COLLECT & REPORT
 
 1. **Summary of what was built:**
    - Total service+location pages generated
@@ -276,11 +329,33 @@ Terminal 2 (Playwright Tests):
 
 ## 🛠️ Available Agents
 
+### business-researcher
+
+**Purpose**: Research specific business when user provides business name
+
+**Invoked**: Only if user provides business name (Step 1)
+
+**Input:**
+- Business name
+- Service niche
+- Service area
+- Jina API key
+
+**Output:**
+- Comprehensive business profile with real data
+- Company history and background
+- Real reviews and testimonials
+- Qualifications and certifications
+- Team information
+- Unique selling points
+- Contact information
+- Saved to `/business-profile.json`
+
 ### design-generator
 
 **Purpose**: Generate complete HTML/CSS/JS design for service websites
 
-**Invoked**: Only if user doesn't provide design (Step 1)
+**Invoked**: Only if user doesn't provide design (Step 2)
 
 **Input:**
 - Service niche for design context
@@ -325,11 +400,33 @@ Terminal 2 (Playwright Tests):
 - Comprehensive JSON schema for service pages
 - Schema saved to `/service-schema-template.json`
 
+### database-agent
+
+**Purpose**: Set up complete database infrastructure (local + production)
+
+**Invoked**: Once after service schema creation (Step 5) using Task tool
+
+**Input:**
+- Project directory path
+- Service niche
+- Service area
+- Suggested database name
+
+**Output:**
+- Local PostgreSQL running (Docker or native)
+- Digital Ocean Managed PostgreSQL provisioned
+- Prisma ORM configured with comprehensive schema
+- Database tables created (ContactForm, QuoteRequest, CallbackRequest, PageView, EmailSubscriber)
+- API routes for form submissions
+- Helper functions created
+- Environment variables configured
+- Documentation created
+
 ### service-page-generator
 
-**Purpose**: Generate 10-15 service+location page combinations with Unsplash images
+**Purpose**: Generate 10-15 service+location page combinations with Unsplash images (FREE only, no premium)
 
-**Invoked**: N agents spawned in parallel (Step 5) using Task tool
+**Invoked**: N agents spawned in parallel (Step 7) using Task tool
 
 **Input per agent:**
 - Service schema template path

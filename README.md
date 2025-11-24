@@ -9,19 +9,23 @@ Turn any service business into a complete, SEO-optimized service website with ju
 Give it:
 - **A service niche** ("Plumber", "Electrician", "Carpet Cleaning", "HVAC", "Roofing")
 - **A service area** ("Galway, Ireland", "Austin, Texas", "Manchester, UK")
-- **Jina API key** (for location research, service research, and Unsplash image scraping)
+- **Your business name** (optional - for personalized content with real business info)
+- **Jina API key** (for research and Unsplash image scraping)
 - **HTML/CSS/JS design** (optional - it'll generate one if you don't have it)
 
 Get:
 - **Complete NextJS service website**
 - **200-500+ SEO-optimized pages** (homepage, service pages, location pages, service+location combinations)
-- **Real Unsplash images** on every page (3-5 per page)
+- **Real Unsplash images** on every page (3-5 per page, free images only)
+- **Personalized content** with your real business info, reviews, and testimonials (if business name provided)
+- **Complete database setup** - Local PostgreSQL + Digital Ocean Managed PostgreSQL with Prisma ORM
+- **Working contact forms** connected to database (contact, quote requests, callback requests)
 - **Comprehensive local SEO** for every service in every location
 - **Clickbait titles** optimized for Google ("Emergency Plumber Athenry - 24/7 Fast Response")
 - **Dynamic routing** for all service+location combinations
 - **Click-to-call functionality** and trust signals
 - **Responsive design** with strong CTAs
-- **Ready to deploy** to Vercel, Digital Ocean, Netlify, etc.
+- **Ready to deploy** to Digital Ocean (database auto-configured)
 
 ## ⚡ Quick Start
 
@@ -57,18 +61,21 @@ You: "Make me a service website for [SERVICE NICHE] in [SERVICE AREA]"
 **Claude will ask you for:**
 1. **Service Niche** - What service business (e.g., "Plumber", "Electrician")
 2. **Service Area** - Main city/region (e.g., "Galway, Ireland", "Austin, Texas")
-3. **Jina API Key** - For location research, service research, and Unsplash images
-4. **HTML/CSS/JS design** - Provide your own OR let the system generate one
+3. **Business Name** (Optional) - Your actual business name for personalization
+4. **Jina API Key** - For research and Unsplash images
+5. **HTML/CSS/JS design** (Optional) - Provide your own OR let the system generate one
 
 **Then Claude automatically:**
-1. Generates/saves design (if needed)
-2. Discovers 20-50+ locations within service radius
-3. Researches service niche and creates 5-15 common services
-4. Spawns 20-30 parallel agents to generate all service+location pages with Unsplash images
-5. Builds complete NextJS website with local SEO optimization
-6. Tests with Playwright
-7. Pushes to GitHub
-8. Gives you deployment instructions
+1. Researches your business (if name provided) - gathers real info, reviews, testimonials
+2. Generates/saves design (if needed)
+3. Discovers 20-50+ locations within service radius
+4. Researches service niche and creates 5-15 common services
+5. Sets up complete database (local PostgreSQL + Digital Ocean Managed PostgreSQL)
+6. Spawns 20-30 parallel agents to generate all service+location pages with free Unsplash images
+7. Builds complete NextJS website with working forms and database integration
+8. Tests with Playwright
+9. Pushes to GitHub
+10. Gives you deployment instructions
 
 ## 📖 Example Session
 
@@ -115,34 +122,53 @@ COMPLETE! Your plumbing service website is ready:
 ### The Automated Workflow
 
 ```
-USER INPUT → DESIGN → LOCATIONS → SERVICES → PAGES (PARALLEL + UNSPLASH) → NEXTJS → TEST → GITHUB
+USER INPUT → BUSINESS RESEARCH → DESIGN → LOCATIONS → SERVICES → DATABASE → PAGES (PARALLEL + UNSPLASH) → NEXTJS → TEST → GITHUB
 ```
 
-**Step 1: Design Generation (if needed)**
+**Step 1: Business Research (if business name provided)**
+- `business-researcher` agent researches your actual business
+- Scrapes official website, Google Reviews, business directories
+- Gathers real company history, qualifications, testimonials
+- Collects team info, awards, unique selling points
+- Saves comprehensive business profile for personalization
+
+**Step 2: Design Generation (if needed)**
 - `design-generator` agent creates service-focused HTML/CSS/JS design
 - Includes trust signals, testimonials, CTAs, click-to-call
 - Or uses your provided design
 
-**Step 2: Location Discovery**
+**Step 3: Location Discovery**
 - `location-generator` agent researches service area
 - Discovers 20-50+ locations within appropriate radius
 - Uses logic: Ireland/UK = 50km, US = 30 miles, adjusts for service type
 - Creates comprehensive locations list
 
-**Step 3: Service Schema Creation**
+**Step 4: Service Schema Creation**
 - `service-schema-creator` agent researches service niche
 - Identifies 5-15 common services (e.g., for plumbers: Emergency, Bathroom Installation, Drain Cleaning, etc.)
 - Creates comprehensive JSON schema for service pages
 - Includes fields for: descriptions, benefits, process, FAQs, images, SEO
 
-**Step 4: Parallel Page Generation with Unsplash**
+**Step 5: Database Setup**
+- `database-agent` sets up complete database infrastructure
+- Installs/checks doctl CLI for Digital Ocean
+- Sets up local PostgreSQL (Docker or native) for development
+- Provisions Digital Ocean Managed PostgreSQL for production
+- Configures Prisma ORM with comprehensive schema
+- Creates tables: ContactForm, QuoteRequest, CallbackRequest, PageView, EmailSubscriber
+- Sets up API routes for all forms
+- Configures environment variables
+- Creates helper functions and documentation
+
+**Step 6: Parallel Page Generation with Unsplash**
 - Spawns N `service-page-generator` agents simultaneously
 - Each agent creates 10-15 service+location page combinations
 - 10 services × 30 locations = 300 pages = 25 agents in parallel
-- **Each agent scrapes Unsplash via Jina for 3-5 images per page**
+- **Each agent scrapes Unsplash via Jina for 3-5 FREE images per page** (no premium images)
 - All pages get unique content optimized for local SEO
+- Business personalization applied if business profile exists
 
-**Step 5: NextJS Website Build**
+**Step 7: NextJS Website Build**
 - `nextjs-builder` agent creates complete site
 - **SEO-OPTIMIZED pages:**
   - Homepage with service overview
@@ -158,14 +184,18 @@ USER INPUT → DESIGN → LOCATIONS → SERVICES → PAGES (PARALLEL + UNSPLASH)
 - Schema.org markup
 - Dynamic routing
 
-**Step 6: Playwright Testing**
+- All pages integrated with database forms
+- Business profile data incorporated throughout
+
+**Step 8: Playwright Testing**
 - Tests all page types for errors
 - Validates local SEO meta tags
 - Checks Unsplash images load correctly
 - Tests click-to-call functionality
+- Tests form submissions to database
 - Verifies mobile responsiveness
 
-**Step 7: GitHub Deployment**
+**Step 9: GitHub Deployment**
 - Orchestrator pushes to GitHub
 - Returns repository URL
 - Provides deployment instructions
@@ -215,10 +245,19 @@ USER INPUT → DESIGN → LOCATIONS → SERVICES → PAGES (PARALLEL + UNSPLASH)
 ## 🛠️ The Agent System
 
 ### Main Orchestrator (CLAUDE.md)
-- Collects user inputs
+- Collects user inputs (including optional business name)
 - Coordinates all agents
 - Manages workflow
 - Handles testing and GitHub deployment
+
+### business-researcher
+- Researches specific business when name provided
+- Scrapes official website, Google Reviews, directories
+- Gathers real company history and background
+- Collects genuine testimonials and reviews
+- Verifies qualifications and certifications
+- Identifies unique selling points
+- Personalizes entire website with real data
 
 ### design-generator
 - Creates service-focused HTML/CSS/JS design
@@ -238,11 +277,22 @@ USER INPUT → DESIGN → LOCATIONS → SERVICES → PAGES (PARALLEL + UNSPLASH)
 - Creates comprehensive page schema
 - Defines content structure for all pages
 
+### database-agent
+- Sets up local PostgreSQL (Docker or native)
+- Provisions Digital Ocean Managed PostgreSQL
+- Configures Prisma ORM with full schema
+- Creates 5 database tables
+- Sets up API routes for forms
+- Creates helper functions
+- Configures local + production environments
+- Seamless dev-to-prod workflow
+
 ### service-page-generator (Parallel Agents)
 - Spawned 20-30 at once
 - Each creates 10-15 service+location pages
-- **Scrapes Unsplash via Jina** for 3-5 images per page
+- **Scrapes Unsplash via Jina** for 3-5 **FREE** images per page (no premium)
 - Generates unique, location-specific content
+- Incorporates business profile data if available
 - Follows schema exactly
 - Real, comprehensive data
 
