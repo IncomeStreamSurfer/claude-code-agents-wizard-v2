@@ -162,12 +162,73 @@ You: "Before we start, I need to verify your setup:
    - `convex/ai/*.ts` - Convex AI actions
    - `hooks/useAI.ts` - React hooks for AI
 
-### Step 5: NEXT.JS FRONTEND BUILDING
+### Step 5: LANDING PAGE GENERATION (Critical for Growth!)
+
+**Generate 50-100+ SEO landing pages to drive signups:**
+
+1. **Calculate landing pages needed:**
+   - Feature pages (5-10): One per major AI feature
+   - Use case pages (10-15): One per target use case
+   - Industry pages (10-15): One per target industry
+   - Comparison pages (5-10): "Alternative to X" pages
+   - Problem/Solution pages (10-15): Pain point targeting
+
+2. **Spawn landing-page-generator agents in PARALLEL:**
+   - Each agent generates 10-15 landing page JSON files
+   - All agents work simultaneously
+   - Each page has clickbait SEO title + strong CTAs
+
+3. **Invoke landing-page-generator agents** with:
+   - SaaS product info (features, AI capabilities)
+   - Target audience
+   - Jina API key (for competitor research)
+   - Assigned page categories
+
+4. **Agents create JSON files in `/landing-pages/`:**
+   ```
+   /landing-pages/
+     /features/
+       ai-chat-assistant.json
+       ai-text-generation.json
+       ...
+     /use-cases/
+       ai-for-content-marketing.json
+       ai-for-customer-support.json
+       ...
+     /industries/
+       ai-for-ecommerce.json
+       ai-for-saas.json
+       ...
+     /comparisons/
+       chatgpt-alternative.json
+       jasper-alternative.json
+       ...
+     /problems/
+       write-marketing-copy-faster.json
+       generate-content-ideas.json
+       ...
+   ```
+
+5. **Each landing page includes:**
+   - Clickbait SEO title (50-60 chars)
+   - Compelling meta description
+   - Hero headline + subheadline
+   - Primary CTA ("Start Free Today")
+   - Secondary CTA ("See Demo")
+   - Benefits with icons
+   - Social proof (stats, testimonials)
+   - FAQ section
+   - Keywords for SEO
+
+**WHY THIS MATTERS**: Landing pages are your growth engine. Every page targets a specific search term and drives signups. 50+ pages = 50+ opportunities to rank on Google.
+
+### Step 6: NEXT.JS FRONTEND BUILDING
 
 1. **Invoke nextjs-builder agent** with:
    - Project analysis (from import or requirements)
    - Convex functions created
    - AI implementations
+   - Landing page JSON files (from Step 5)
    - Original design (if from AI Studio)
 
 2. **Agent will:**
@@ -177,15 +238,35 @@ You: "Before we start, I need to verify your setup:
    - Implement AI feature UIs
    - Add real-time updates (Convex)
    - Style with Tailwind CSS
+   - **BUILD ALL LANDING PAGES with strong CTAs**
+   - Create dynamic routes for landing pages
+   - Add sitemap with all pages
 
 3. **Files created:**
-   - `app/page.tsx` - Homepage
+   - `app/page.tsx` - Homepage with hero CTA
    - `app/sign-in/[[...sign-in]]/page.tsx` - Sign in
    - `app/sign-up/[[...sign-up]]/page.tsx` - Sign up
    - `app/dashboard/*` - Dashboard pages
    - `components/*` - Reusable components
+   - **`app/(marketing)/features/[slug]/page.tsx`** - Feature landing pages
+   - **`app/(marketing)/use-cases/[slug]/page.tsx`** - Use case pages
+   - **`app/(marketing)/industries/[slug]/page.tsx`** - Industry pages
+   - **`app/(marketing)/vs/[slug]/page.tsx`** - Comparison pages
+   - **`app/(marketing)/solutions/[slug]/page.tsx`** - Problem/solution pages
+   - **`components/landing/*`** - Landing page components (Hero, CTA, Testimonials)
+   - **`app/sitemap.ts`** - Sitemap with ALL pages
 
-### Step 6: INTEGRATION & TESTING
+4. **Landing page features:**
+   - Sticky header with CTA button
+   - Hero section with primary CTA
+   - Benefits grid with icons
+   - Social proof section
+   - FAQ accordion
+   - Footer CTA
+   - Mobile-optimized design
+   - Fast page loads (static generation)
+
+### Step 7: INTEGRATION & TESTING
 
 1. **Start the development server:**
    ```bash
@@ -197,6 +278,7 @@ You: "Before we start, I need to verify your setup:
    - Project directory
    - Expected features list
    - AI provider configurations
+   - **List of all landing pages to test**
 
 3. **Tester will verify:**
    - Authentication flow works
@@ -204,13 +286,17 @@ You: "Before we start, I need to verify your setup:
    - AI features respond correctly
    - All pages render without errors
    - Database operations work
+   - **ALL landing pages load (no 404s)**
+   - **CTAs link to sign-up correctly**
+   - **SEO meta tags present on all pages**
+   - **Mobile responsiveness on landing pages**
 
 4. **If tests fail:**
    - Invoke stuck agent for human guidance
    - Fix issues based on feedback
    - Re-test
 
-### Step 7: FINALIZATION
+### Step 8: FINALIZATION
 
 1. **Environment variables documentation:**
    Create `.env.example` with all required variables:
@@ -263,10 +349,15 @@ You: "Before we start, I need to verify your setup:
 **Tools**: Read, Write, Edit, Bash
 **When invoked**: After Convex backend ready
 
+### landing-page-generator
+**Purpose**: Generate 50-100+ SEO landing pages with CTAs for signups
+**Tools**: Read, Write, Bash
+**When invoked**: After AI implementation, before frontend build (in parallel)
+
 ### nextjs-builder
-**Purpose**: Build Next.js frontend with Clerk auth
+**Purpose**: Build Next.js frontend with Clerk auth AND all landing pages
 **Tools**: Read, Write, Edit, Bash, Glob
-**When invoked**: After backend and AI implementation
+**When invoked**: After landing pages generated
 
 ### tester
 **Purpose**: Test the complete application
@@ -321,21 +412,43 @@ You invoke ai-implementor:
 - Implements Google provider (exact model names from docs)
 - Creates unified AI hooks
 
-STEP 5: NEXT.JS FRONTEND
+STEP 5: LANDING PAGE GENERATION (Growth Engine!)
+You calculate: Need ~60 landing pages
+You spawn 5 landing-page-generator agents in PARALLEL:
+- Agent 1: 12 feature pages (ai-chat, ai-generation, etc.)
+- Agent 2: 12 use case pages (content-marketing, customer-support, etc.)
+- Agent 3: 12 industry pages (ecommerce, saas, agencies, etc.)
+- Agent 4: 12 comparison pages (chatgpt-alternative, jasper-alternative, etc.)
+- Agent 5: 12 problem/solution pages (write-copy-faster, etc.)
+
+[All agents create JSON files in /landing-pages/ simultaneously]
+
+STEP 6: NEXT.JS FRONTEND
 You invoke nextjs-builder:
 - Creates auth pages with Clerk
 - Builds dashboard
 - Integrates original AI Studio UI
 - Connects to Convex
+- **BUILDS ALL 60 LANDING PAGES**
+- Each landing page has:
+  * Clickbait SEO title
+  * Hero with CTA
+  * Benefits section
+  * Social proof
+  * FAQ
+  * Footer CTA
 
-STEP 6: TESTING
+STEP 7: TESTING
 You start dev server
 You invoke tester:
 - Tests auth flow ✅
 - Tests AI features ✅
 - Tests data persistence ✅
+- **Tests all 60 landing pages ✅**
+- **Verifies CTAs link to signup ✅**
+- **Checks SEO meta tags ✅**
 
-STEP 7: COMPLETE
+STEP 8: COMPLETE
 You: "✅ Your SaaS is ready!
 
 Features:
@@ -344,8 +457,24 @@ Features:
 - Project saving & history
 - Real-time sync
 
+LANDING PAGES (60 total):
+- 12 feature pages
+- 12 use case pages
+- 12 industry pages
+- 12 comparison pages ("ChatGPT Alternative", etc.)
+- 12 problem/solution pages
+
+SEO Ready:
+- All pages have clickbait titles
+- All pages have meta descriptions
+- Sitemap includes all 60+ pages
+- Strong CTAs on every page
+
 Run: npm run dev
 Dashboard: http://localhost:3000/dashboard
+Landing pages: http://localhost:3000/features/ai-chat
+              http://localhost:3000/vs/chatgpt-alternative
+              http://localhost:3000/industries/ecommerce
 
 AI Providers configured:
 - OpenAI: gpt-4o, gpt-4-turbo, dall-e-3
