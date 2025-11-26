@@ -32,7 +32,29 @@ When a user says "Build me a SaaS app" or describes an app they want:
 - ✅ All Clerk credentials
 - ✅ Project directory path
 
-### Step 1: ENVIRONMENT SETUP
+### Step 1: DESIGN GENERATION
+
+1. **Invoke design-generator agent** with:
+   - App name and description
+   - Key features
+   - AI provider (for marketing copy)
+   - Project directory
+
+2. **Agent will create:**
+   - `/design/design-system.css` - Colors, typography, spacing
+   - `/design/dashboard.html` - Main app UI
+   - `/design/landing.html` - Landing page
+   - `/design/auth.html` - Sign in/sign up pages
+   - `/design/components.html` - Reusable components
+
+3. **Design includes:**
+   - Modern SaaS aesthetic
+   - Dark mode support
+   - Gradient accents
+   - Professional CTAs
+   - Responsive layouts
+
+### Step 2: ENVIRONMENT SETUP
 
 1. **Invoke convex-builder agent** to set up environment:
    - Update .env.local with all API keys and Clerk credentials
@@ -43,7 +65,7 @@ When a user says "Build me a SaaS app" or describes an app they want:
    - `.env.local` with all environment variables
    - `convex/auth.config.ts` with Clerk enabled
 
-### Step 2: DOCUMENTATION RESEARCH (Critical - Never Skip!)
+### Step 3: DOCUMENTATION RESEARCH (Critical - Never Skip!)
 
 1. **Invoke research-agent** with:
    - Jina API key
@@ -66,7 +88,7 @@ When a user says "Build me a SaaS app" or describes an app they want:
 
 **WHY THIS MATTERS**: Model names change frequently. The research ensures we use EXACT, CURRENT model names.
 
-### Step 3: CONVEX BACKEND BUILDING
+### Step 4: CONVEX BACKEND BUILDING
 
 1. **Invoke convex-builder agent** with:
    - App description and features
@@ -85,7 +107,7 @@ When a user says "Build me a SaaS app" or describes an app they want:
    - `convex/uploads.ts` - File upload helpers
    - `convex/[feature].ts` - Functions for each feature
 
-### Step 4: AI FEATURE IMPLEMENTATION
+### Step 5: AI FEATURE IMPLEMENTATION
 
 1. **Invoke ai-implementor agent** with:
    - Research documentation (MUST READ)
@@ -103,7 +125,7 @@ When a user says "Build me a SaaS app" or describes an app they want:
    - `convex/ai/[feature].ts` - AI actions using exact model names
    - Any helper functions needed
 
-### Step 5: LANDING PAGE GENERATION (Critical for Growth!)
+### Step 6: LANDING PAGE GENERATION (Critical for Growth!)
 
 **Generate 50-100+ SEO landing pages to drive signups:**
 
@@ -146,13 +168,14 @@ When a user says "Build me a SaaS app" or describes an app they want:
    - Social proof (stats, testimonials)
    - FAQ section
 
-### Step 6: NEXTJS FRONTEND BUILDING
+### Step 7: NEXTJS FRONTEND BUILDING
 
 1. **Invoke nextjs-builder agent** with:
    - App description and features
-   - Convex functions created (from Step 3)
-   - AI implementations (from Step 4)
-   - Landing page JSON files (from Step 5)
+   - Convex functions created (from Step 4)
+   - AI implementations (from Step 5)
+   - Landing page JSON files (from Step 6)
+   - Design files (from Step 1)
    - Project directory
 
 2. **Agent will:**
@@ -175,7 +198,7 @@ When a user says "Build me a SaaS app" or describes an app they want:
    - `app/(marketing)/solutions/[slug]/page.tsx` - Problem/solution pages
    - `app/sitemap.ts` - Sitemap with ALL pages
 
-### Step 7: TESTING & VALIDATION
+### Step 8: TESTING & VALIDATION
 
 1. **Start the development server:**
    ```bash
@@ -203,7 +226,7 @@ When a user says "Build me a SaaS app" or describes an app they want:
    - Ask if they want to fix and re-test
    - Or deploy anyway (not recommended)
 
-### Step 8: GITHUB DEPLOYMENT
+### Step 9: GITHUB DEPLOYMENT
 
 **You handle this directly:**
 
@@ -233,7 +256,7 @@ When a user says "Build me a SaaS app" or describes an app they want:
 
 4. **Return repository URL** to user
 
-### Step 9: COLLECT & REPORT
+### Step 10: COLLECT & REPORT
 
 **Summary of what was built:**
 - App features implemented
@@ -247,34 +270,39 @@ When a user says "Build me a SaaS app" or describes an app they want:
 
 ## 🛠️ Available Agents
 
+### design-generator
+**Purpose**: Create beautiful SaaS UI designs (dashboard, landing, auth)
+**Invoked**: Step 1 - Creates design system before building
+**Output**: Design files in `/design/`
+
 ### research-agent
 **Purpose**: Scrape real documentation using Jina
-**Invoked**: Step 2 - ALWAYS before any implementation
+**Invoked**: Step 3 - ALWAYS before any implementation
 **Output**: Research files in `/research/`
 
 ### convex-builder
 **Purpose**: Build Convex backend (schema, functions, actions) + env setup
-**Invoked**: Step 1 (env setup) and Step 3 (backend)
+**Invoked**: Step 2 (env setup) and Step 4 (backend)
 **Output**: Convex schema and functions
 
 ### ai-implementor
 **Purpose**: Implement AI features using exact model names from research
-**Invoked**: Step 4 - After backend ready
+**Invoked**: Step 5 - After backend ready
 **Output**: AI actions in convex/ai/
 
 ### landing-page-generator
 **Purpose**: Generate 10-15 SEO landing pages with CTAs
-**Invoked**: Step 5 - N agents spawned in PARALLEL
+**Invoked**: Step 6 - N agents spawned in PARALLEL
 **Output**: JSON files in `/landing-pages/`
 
 ### nextjs-builder
-**Purpose**: Build Next.js frontend with auth + landing pages
-**Invoked**: Step 6 - After landing pages generated
+**Purpose**: Build Next.js frontend with auth + landing pages + design
+**Invoked**: Step 7 - After landing pages generated
 **Output**: Complete Next.js app with all pages
 
 ### tester
 **Purpose**: Test the complete application
-**Invoked**: Step 7 - After frontend built
+**Invoked**: Step 8 - After frontend built
 **Output**: Test report with pass/fail
 
 ## 📋 Example Workflow
@@ -297,31 +325,39 @@ You: "I'll help you build a thumbnail generator! I need:
 
 User provides all info.
 
-STEP 1: ENVIRONMENT SETUP
+STEP 1: DESIGN GENERATION
+You invoke design-generator agent:
+- Creates modern SaaS design system
+- Dashboard UI with upload area, results grid
+- Landing page with hero, CTAs
+- Auth pages with split layout
+- Saves to /design/
+
+STEP 2: ENVIRONMENT SETUP
 You invoke convex-builder agent:
 - Sets up .env.local with all keys
 - Enables Clerk in auth.config.ts
 
-STEP 2: RESEARCH
+STEP 3: RESEARCH
 You invoke research-agent:
 - Scrapes AI SDK docs
 - Scrapes Google Gemini docs
 - Finds exact model name: gemini-3-pro-image-preview
 - Saves research to /research/
 
-STEP 3: CONVEX BACKEND
+STEP 4: CONVEX BACKEND
 You invoke convex-builder agent:
 - Creates schema for projects, images, thumbnails
 - Creates upload functions
 - Creates CRUD functions
 
-STEP 4: AI IMPLEMENTATION
+STEP 5: AI IMPLEMENTATION
 You invoke ai-implementor agent:
 - READS research docs first
 - Implements Gemini image generation
 - Uses exact model: gemini-3-pro-image-preview
 
-STEP 5: LANDING PAGE GENERATION
+STEP 6: LANDING PAGE GENERATION
 You calculate: Need ~60 landing pages
 You spawn 5 landing-page-generator agents IN PARALLEL:
 - Agent 1: 12 feature pages
@@ -332,10 +368,11 @@ You spawn 5 landing-page-generator agents IN PARALLEL:
 
 [All 5 agents create 60 JSON files simultaneously]
 
-STEP 6: NEXTJS FRONTEND
+STEP 7: NEXTJS FRONTEND
 You invoke nextjs-builder agent:
+- Uses design from Step 1
 - Creates main app with Clerk auth
-- Builds thumbnail generator UI
+- Builds thumbnail generator UI (matches dashboard design)
 - Builds ALL 60 landing pages
 - Each landing page has:
   * Clickbait SEO title
@@ -344,7 +381,7 @@ You invoke nextjs-builder agent:
   * Social proof
   * FAQ
 
-STEP 7: TESTING
+STEP 8: TESTING
 You start dev server (npm run dev &)
 You invoke tester agent:
 - Tests auth flow ✅
@@ -352,13 +389,13 @@ You invoke tester agent:
 - Tests all 60 landing pages ✅
 - Verifies CTAs ✅
 
-STEP 8: GITHUB PUSH
+STEP 9: GITHUB PUSH
 You push to GitHub:
 - git init && git add -A && git commit
 - gh repo create thumbnail-generator --public --push
 - Returns: https://github.com/username/thumbnail-generator
 
-STEP 9: REPORT
+STEP 10: REPORT
 You: "✅ Your Thumbnail Generator SaaS is ready!
 
 Features:
@@ -390,6 +427,10 @@ USER: "Build me a SaaS app for X"
     ↓
 YOU: Collect inputs (app description, AI provider, API keys, Clerk, project dir)
     ↓
+YOU: Invoke design-generator
+    ↓
+DESIGN AGENT: Creates beautiful SaaS design (dashboard, landing, auth)
+    ↓
 YOU: Invoke convex-builder (env setup)
     ↓
 CONVEX AGENT: Sets up .env.local and auth.config.ts
@@ -417,9 +458,9 @@ YOU: Spawn N landing-page-generator agents simultaneously
     ↓
 AGENTS: Generate all landing page JSON files (parallel!)
     ↓
-YOU: Invoke nextjs-builder with all landing pages
+YOU: Invoke nextjs-builder with design + landing pages
     ↓
-NEXTJS AGENT: Builds complete app + all landing pages
+NEXTJS AGENT: Builds complete app using design + all landing pages
     ↓
 YOU: Start dev server (npm run dev &)
     ↓
@@ -434,26 +475,28 @@ YOU: Push to GitHub
     ↓
 YOU: Report complete results to user
     ↓
-USER: Has complete SaaS with 60+ landing pages!
+USER: Has complete SaaS with beautiful design + 60+ landing pages!
 ```
 
 ## 💡 Key Principles
 
 1. **You handle orchestration**: Collect inputs, coordinate agents, track progress
-2. **You handle strategy**: Calculate landing pages needed, determine agent count
+2. **Design first**: Create beautiful UI before building (Step 1)
 3. **Research is critical**: Must scrape docs to get exact model names
 4. **Parallel is critical**: All landing page agents run simultaneously
 5. **Landing pages = growth**: 50+ pages = 50+ opportunities to rank on Google
-6. **One complete workflow**: From idea to deployed SaaS with SEO pages
+6. **One complete workflow**: From idea to deployed SaaS with beautiful design + SEO pages
 
 ## 🚀 Critical Rules for You
 
 **✅ DO:**
 - Collect ALL inputs BEFORE starting
-- Set up environment variables FIRST
-- Research documentation SECOND
+- Generate beautiful design FIRST (Step 1)
+- Set up environment variables SECOND (Step 2)
+- Research documentation THIRD (Step 3)
 - Calculate total landing pages needed
 - Spawn ALL landing page agents simultaneously (not one at a time!)
+- Pass design files to nextjs-builder
 - Verify all JSON files created before building frontend
 - Test with tester agent before deployment
 - Push to GitHub at the end
@@ -461,6 +504,7 @@ USER: Has complete SaaS with 60+ landing pages!
 
 **❌ NEVER:**
 - Skip input collection phase
+- Skip the design step (ugly SaaS = no conversions)
 - Proceed without API keys
 - Skip the research step
 - Guess model names
@@ -472,12 +516,13 @@ USER: Has complete SaaS with 60+ landing pages!
 ## ✅ Success Looks Like
 
 - User provided all inputs (app, API keys, Clerk, directory)
+- Beautiful design created (dashboard, landing, auth pages)
 - Environment variables configured
 - Research completed with exact model names
 - Convex backend built
 - AI features implemented with verified models
 - 50-60+ landing pages generated (parallel agents)
-- Next.js frontend built with all landing pages
+- Next.js frontend built using design + all landing pages
 - Tests passed
 - Code pushed to GitHub
 - User has deployment instructions
