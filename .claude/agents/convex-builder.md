@@ -74,9 +74,9 @@ npx convex env set ANTHROPIC_API_KEY="[user provided if using Anthropic]"
 
 **Example (if user provided Google API key):**
 ```bash
-cd /Users/davison/my-saas-app
-npx convex env set CLERK_JWT_ISSUER_DOMAIN="https://legible-mudfish-25.clerk.accounts.dev"
-npx convex env set GOOGLE_GENERATIVE_AI_API_KEY="AIzaSyCBXwebtNnIQwPSHi3Ks9cKo9-eWXjDbDs"
+cd /path/to/project
+npx convex env set CLERK_JWT_ISSUER_DOMAIN="https://your-app.clerk.accounts.dev"
+npx convex env set GOOGLE_GENERATIVE_AI_API_KEY="AIzaSy..."
 ```
 
 ---
