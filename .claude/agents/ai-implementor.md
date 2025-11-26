@@ -228,7 +228,263 @@ export function useAICompletion(options?: Parameters<typeof useCompletion>[0]) {
 }
 ```
 
-## 📁 Step 8: Multi-Provider Support
+## 📁 Step 8: Image Generation (Gemini/DALL-E)
+
+**CRITICAL: For image generation, use the EXACT model name from research docs**
+
+**File: `convex/ai/generateImage.ts`** (for Gemini image generation)
+
+```typescript
+"use node";
+
+import { action } from "../_generated/server";
+import { v } from "convex/values";
+
+// Gemini Image Generation Action
+// Model name MUST come from research docs (e.g., gemini-2.0-flash-exp, gemini-3-pro-image-preview)
+export const generateImage = action({
+  args: {
+    prompt: v.string(),
+    imageBase64: v.optional(v.string()), // Optional base image for editing
+    model: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    if (!apiKey) throw new Error("GOOGLE_GENERATIVE_AI_API_KEY not set");
+
+    // Use model from args or default from research docs
+    const modelName = args.model || "gemini-2.0-flash-exp"; // UPDATE based on research!
+
+    const requestBody: any = {
+      contents: [
+        {
+          role: "user",
+          parts: args.imageBase64
+            ? [
+                { text: args.prompt },
+                {
+                  inlineData: {
+                    mimeType: "image/jpeg",
+                    data: args.imageBase64,
+                  },
+                },
+              ]
+            : [{ text: args.prompt }],
+        },
+      ],
+      generationConfig: {
+        responseModalities: ["TEXT", "IMAGE"],
+      },
+    };
+
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(requestBody),
+      }
+    );
+
+    if (!response.ok) {
+      const error = await response.text();
+      throw new Error(`Gemini API error: ${error}`);
+    }
+
+    const data = await response.json();
+
+    // Extract generated image from response
+    const parts = data.candidates?.[0]?.content?.parts || [];
+    for (const part of parts) {
+      if (part.inlineData?.mimeType?.startsWith("image/")) {
+        return {
+          imageBase64: part.inlineData.data,
+          mimeType: part.inlineData.mimeType,
+        };
+      }
+    }
+
+    throw new Error("No image generated in response");
+  },
+});
+```
+
+**File: `convex/ai/generateThumbnails.ts`** (for batch thumbnail generation)
+
+```typescript
+"use node";
+
+import { action, internalMutation } from "../_generated/server";
+import { internal } from "../_generated/api";
+import { v } from "convex/values";
+
+// Thumbnail style prompts for variety
+const THUMBNAIL_STYLES = [
+  "Create a dramatic, attention-grabbing thumbnail with bold colors and high contrast.",
+  "Transform into a viral YouTube thumbnail style with explosive effects and vibrant colors.",
+  "Create a curiosity-gap thumbnail with mystery elements and dramatic shadows.",
+  "Make a high-energy reaction thumbnail with shock effects and motion blur.",
+  "Create a professional business thumbnail with clean lines and modern design.",
+  "Design a clickbait-style thumbnail with arrows, circles, and emphasized text areas.",
+  "Create an emotional thumbnail that evokes curiosity and engagement.",
+  "Design a minimalist but eye-catching thumbnail with strong focal point.",
+];
+
+export const generateThumbnails = action({
+  args: {
+    imageStorageId: v.id("_storage"),
+    count: v.optional(v.number()), // Default 8
+    model: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+    if (!apiKey) throw new Error("GOOGLE_GENERATIVE_AI_API_KEY not set");
+
+    // Get the original image
+    const imageUrl = await ctx.storage.getUrl(args.imageStorageId);
+    if (!imageUrl) throw new Error("Image not found");
+
+    const imageResponse = await fetch(imageUrl);
+    const imageBuffer = await imageResponse.arrayBuffer();
+    const imageBase64 = Buffer.from(imageBuffer).toString("base64");
+
+    const count = args.count || 8;
+    const modelName = args.model || "gemini-2.0-flash-exp"; // UPDATE from research!
+
+    const results = [];
+
+    for (let i = 0; i < count; i++) {
+      const stylePrompt = THUMBNAIL_STYLES[i % THUMBNAIL_STYLES.length];
+
+      try {
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [
+                {
+                  role: "user",
+                  parts: [
+                    {
+                      text: `${stylePrompt}\n\nEdit this image to create an eye-catching clickbait thumbnail. Keep the main subject but make it dramatically more engaging.`,
+                    },
+                    {
+                      inlineData: {
+                        mimeType: "image/jpeg",
+                        data: imageBase64,
+                      },
+                    },
+                  ],
+                },
+              ],
+              generationConfig: {
+                responseModalities: ["TEXT", "IMAGE"],
+              },
+            }),
+          }
+        );
+
+        if (!response.ok) {
+          console.error(`Generation ${i + 1} failed:`, await response.text());
+          continue;
+        }
+
+        const data = await response.json();
+        const parts = data.candidates?.[0]?.content?.parts || [];
+
+        for (const part of parts) {
+          if (part.inlineData?.mimeType?.startsWith("image/")) {
+            // Store the generated image
+            const imageData = Buffer.from(part.inlineData.data, "base64");
+            const blob = new Blob([imageData], { type: part.inlineData.mimeType });
+            const storageId = await ctx.storage.store(blob);
+
+            results.push({
+              storageId,
+              variation: i + 1,
+              style: stylePrompt,
+            });
+            break;
+          }
+        }
+      } catch (error) {
+        console.error(`Generation ${i + 1} error:`, error);
+      }
+
+      // Small delay between generations to avoid rate limits
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+
+    return results;
+  },
+});
+```
+
+**File: `app/api/ai/image/route.ts`** (API route for image generation)
+
+```typescript
+import { NextRequest } from "next/server";
+
+export async function POST(req: NextRequest) {
+  const { prompt, imageBase64, model } = await req.json();
+
+  const apiKey = process.env.GOOGLE_GENERATIVE_AI_API_KEY;
+  if (!apiKey) {
+    return Response.json({ error: "API key not configured" }, { status: 500 });
+  }
+
+  const modelName = model || "gemini-2.0-flash-exp"; // UPDATE from research!
+
+  const requestBody: any = {
+    contents: [
+      {
+        role: "user",
+        parts: imageBase64
+          ? [
+              { text: prompt },
+              { inlineData: { mimeType: "image/jpeg", data: imageBase64 } },
+            ]
+          : [{ text: prompt }],
+      },
+    ],
+    generationConfig: {
+      responseModalities: ["TEXT", "IMAGE"],
+    },
+  };
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(requestBody),
+    }
+  );
+
+  if (!response.ok) {
+    const error = await response.text();
+    return Response.json({ error }, { status: response.status });
+  }
+
+  const data = await response.json();
+  const parts = data.candidates?.[0]?.content?.parts || [];
+
+  for (const part of parts) {
+    if (part.inlineData?.mimeType?.startsWith("image/")) {
+      return Response.json({
+        imageBase64: part.inlineData.data,
+        mimeType: part.inlineData.mimeType,
+      });
+    }
+  }
+
+  return Response.json({ error: "No image generated" }, { status: 500 });
+}
+```
+
+## 📁 Step 9: Multi-Provider Support
 
 **File: `lib/ai/index.ts`**
 

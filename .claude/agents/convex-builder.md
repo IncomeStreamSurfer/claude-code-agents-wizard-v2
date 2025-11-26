@@ -155,7 +155,7 @@ export default defineSchema({
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-// Get current user
+// Get current user - creates user if doesn't exist
 export const getCurrentUser = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -170,7 +170,48 @@ export const getCurrentUser = query({
   },
 });
 
-// Create or update user (called on sign-in)
+// Sync user from Clerk - called automatically on sign-in/sign-up
+// This ensures user exists in Convex database
+export const syncUser = mutation({
+  args: {
+    clerkId: v.string(),
+    email: v.string(),
+    name: v.optional(v.string()),
+    imageUrl: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Verify the user is authenticated
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    // Check if user already exists
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .unique();
+
+    if (existingUser) {
+      // Update existing user with latest info from Clerk
+      await ctx.db.patch(existingUser._id, {
+        email: args.email,
+        name: args.name || existingUser.name,
+        imageUrl: args.imageUrl || existingUser.imageUrl,
+      });
+      return existingUser._id;
+    }
+
+    // Create new user
+    return await ctx.db.insert("users", {
+      clerkId: args.clerkId,
+      email: args.email,
+      name: args.name,
+      imageUrl: args.imageUrl,
+      createdAt: Date.now(),
+    });
+  },
+});
+
+// Create or update user (manual version with args)
 export const upsertUser = mutation({
   args: {
     clerkId: v.string(),
@@ -200,6 +241,91 @@ export const upsertUser = mutation({
   },
 });
 ```
+
+## 📁 Step 3b: Create User Sync Component (CRITICAL!)
+
+**This component ensures users are synced to Convex on EVERY sign-in/sign-up**
+
+**File: `components/UserSync.tsx`**
+
+```typescript
+"use client";
+
+import { useUser } from "@clerk/nextjs";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useEffect, useRef } from "react";
+
+export function UserSync() {
+  const { user, isLoaded, isSignedIn } = useUser();
+  const syncUser = useMutation(api.users.syncUser);
+  const hasSynced = useRef(false);
+
+  useEffect(() => {
+    // Only sync once per session when user is loaded and signed in
+    if (isLoaded && isSignedIn && user && !hasSynced.current) {
+      hasSynced.current = true;
+
+      // Pass all user data from Clerk to Convex
+      syncUser({
+        clerkId: user.id,
+        email: user.primaryEmailAddress?.emailAddress || "",
+        name: user.fullName || user.firstName || undefined,
+        imageUrl: user.imageUrl || undefined,
+      })
+        .then(() => {
+          console.log("User synced to Convex:", user.id);
+        })
+        .catch((error) => {
+          console.error("Failed to sync user:", error);
+          // Reset so it can retry
+          hasSynced.current = false;
+        });
+    }
+
+    // Reset when user signs out
+    if (isLoaded && !isSignedIn) {
+      hasSynced.current = false;
+    }
+  }, [isLoaded, isSignedIn, user, syncUser]);
+
+  return null; // This component doesn't render anything
+}
+```
+
+**IMPORTANT: Add UserSync to providers.tsx**
+
+**File: `app/providers.tsx`**
+
+```typescript
+'use client';
+
+import { ClerkProvider, useAuth } from '@clerk/nextjs';
+import { ConvexProviderWithClerk } from 'convex/react-clerk';
+import { ConvexReactClient } from 'convex/react';
+import { ReactNode } from 'react';
+import { UserSync } from '@/components/UserSync';
+
+const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+export function Providers({ children }: { children: ReactNode }) {
+  return (
+    <ClerkProvider>
+      <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+        <UserSync /> {/* Auto-syncs user to Convex on sign-in/sign-up */}
+        {children}
+      </ConvexProviderWithClerk>
+    </ClerkProvider>
+  );
+}
+```
+
+**WHY THIS MATTERS:**
+- When a user signs in OR creates an account, Clerk handles auth
+- But Convex database needs the user record too
+- UserSync component automatically creates/updates the user in Convex
+- This runs on every page load when signed in, ensuring sync
+- No manual webhook setup required!
 
 ## 📁 Step 4: Create Project Functions
 

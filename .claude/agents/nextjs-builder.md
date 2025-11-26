@@ -475,6 +475,312 @@ export function CreateProjectButton() {
 }
 ```
 
+## 📁 Step 5b: Create UserSync Component (CRITICAL!)
+
+**This ensures users are added to Convex when they sign in or sign up**
+
+**File: `components/UserSync.tsx`**
+
+```typescript
+"use client";
+
+import { useUser } from "@clerk/nextjs";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useEffect, useRef } from "react";
+
+export function UserSync() {
+  const { user, isLoaded, isSignedIn } = useUser();
+  const syncUser = useMutation(api.users.syncUser);
+  const hasSynced = useRef(false);
+
+  useEffect(() => {
+    if (isLoaded && isSignedIn && user && !hasSynced.current) {
+      hasSynced.current = true;
+
+      // Pass all user data from Clerk to Convex
+      syncUser({
+        clerkId: user.id,
+        email: user.primaryEmailAddress?.emailAddress || "",
+        name: user.fullName || user.firstName || undefined,
+        imageUrl: user.imageUrl || undefined,
+      })
+        .then(() => console.log("User synced to Convex:", user.id))
+        .catch((error) => {
+          console.error("Failed to sync user:", error);
+          hasSynced.current = false;
+        });
+    }
+    if (isLoaded && !isSignedIn) {
+      hasSynced.current = false;
+    }
+  }, [isLoaded, isSignedIn, user, syncUser]);
+
+  return null;
+}
+```
+
+**Update `app/providers.tsx` to include UserSync:**
+
+```typescript
+'use client';
+
+import { ClerkProvider, useAuth } from '@clerk/nextjs';
+import { ConvexProviderWithClerk } from 'convex/react-clerk';
+import { ConvexReactClient } from 'convex/react';
+import { ReactNode } from 'react';
+import { UserSync } from '@/components/UserSync';
+
+const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+export function Providers({ children }: { children: ReactNode }) {
+  return (
+    <ClerkProvider>
+      <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+        <UserSync /> {/* Auto-syncs user to Convex on sign-in/sign-up */}
+        {children}
+      </ConvexProviderWithClerk>
+    </ClerkProvider>
+  );
+}
+```
+
+## 📁 Step 5c: Create Footer Component
+
+**File: `components/Footer.tsx`**
+
+```typescript
+import Link from 'next/link';
+
+export function Footer() {
+  return (
+    <footer className="bg-gray-900 text-gray-300">
+      <div className="container mx-auto px-4 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          {/* Brand */}
+          <div>
+            <h3 className="text-white text-lg font-bold mb-4">Your SaaS</h3>
+            <p className="text-sm">AI-powered tools to help you create amazing content.</p>
+          </div>
+
+          {/* Product */}
+          <div>
+            <h4 className="text-white font-semibold mb-4">Product</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link href="/features/ai-generator" className="hover:text-white">Features</Link></li>
+              <li><Link href="/pricing" className="hover:text-white">Pricing</Link></li>
+              <li><Link href="/use-cases" className="hover:text-white">Use Cases</Link></li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h4 className="text-white font-semibold mb-4">Company</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link href="/about" className="hover:text-white">About</Link></li>
+              <li><Link href="/blog" className="hover:text-white">Blog</Link></li>
+              <li><Link href="/contact" className="hover:text-white">Contact</Link></li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h4 className="text-white font-semibold mb-4">Legal</h4>
+            <ul className="space-y-2 text-sm">
+              <li><Link href="/privacy" className="hover:text-white">Privacy Policy</Link></li>
+              <li><Link href="/terms" className="hover:text-white">Terms of Service</Link></li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="border-t border-gray-800 mt-8 pt-8 text-sm text-center">
+          <p>&copy; {new Date().getFullYear()} Your SaaS. All rights reserved.</p>
+        </div>
+      </div>
+    </footer>
+  );
+}
+```
+
+## 📁 Step 5d: Create Settings Page
+
+**File: `app/dashboard/settings/page.tsx`**
+
+```typescript
+'use client';
+
+import { UserProfile } from '@clerk/nextjs';
+
+export default function SettingsPage() {
+  return (
+    <div>
+      <h1 className="text-2xl font-bold text-gray-900 mb-6">Settings</h1>
+      <div className="bg-white rounded-lg border border-gray-200 p-6">
+        <UserProfile
+          appearance={{
+            elements: {
+              rootBox: "w-full",
+              card: "shadow-none border-0",
+            },
+          }}
+        />
+      </div>
+    </div>
+  );
+}
+```
+
+## 📁 Step 5e: Create Projects List Page
+
+**File: `app/dashboard/projects/page.tsx`**
+
+```typescript
+'use client';
+
+import { useQuery } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { ProjectCard } from '@/components/ProjectCard';
+import { CreateProjectButton } from '@/components/CreateProjectButton';
+
+export default function ProjectsPage() {
+  const projects = useQuery(api.projects.getUserProjects, {});
+
+  if (projects === undefined) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <div className="flex justify-between items-center mb-8">
+        <h1 className="text-2xl font-bold text-gray-900">Your Projects</h1>
+        <CreateProjectButton />
+      </div>
+
+      {projects.length === 0 ? (
+        <div className="text-center py-12 bg-white rounded-lg border-2 border-dashed border-gray-300">
+          <h3 className="text-lg font-medium text-gray-900 mb-2">No projects yet</h3>
+          <p className="text-gray-600 mb-4">Create your first project to get started</p>
+          <CreateProjectButton />
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {projects.map((project) => (
+            <ProjectCard key={project._id} project={project} />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+```
+
+## 📁 Step 5f: Create Single Project Page
+
+**File: `app/dashboard/projects/[id]/page.tsx`**
+
+```typescript
+'use client';
+
+import { useQuery, useMutation } from 'convex/react';
+import { api } from '@/convex/_generated/api';
+import { Id } from '@/convex/_generated/dataModel';
+import { useParams, useRouter } from 'next/navigation';
+import { useState } from 'react';
+import { ArrowLeft, Save } from 'lucide-react';
+import Link from 'next/link';
+
+export default function ProjectPage() {
+  const params = useParams();
+  const router = useRouter();
+  const projectId = params.id as Id<'projects'>;
+
+  const project = useQuery(api.projects.getProject, { projectId });
+  const updateProject = useMutation(api.projects.updateProject);
+
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Initialize form when project loads
+  if (project && title === '' && description === '') {
+    setTitle(project.title);
+    setDescription(project.description || '');
+  }
+
+  if (project === undefined) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
+      </div>
+    );
+  }
+
+  if (project === null) {
+    router.push('/dashboard/projects');
+    return null;
+  }
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await updateProject({
+        projectId,
+        title,
+        description,
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  return (
+    <div>
+      <div className="flex items-center gap-4 mb-6">
+        <Link href="/dashboard/projects" className="p-2 hover:bg-gray-100 rounded-lg">
+          <ArrowLeft className="w-5 h-5" />
+        </Link>
+        <h1 className="text-2xl font-bold text-gray-900">Edit Project</h1>
+      </div>
+
+      <div className="bg-white rounded-lg border border-gray-200 p-6 space-y-6">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            rows={4}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        <button
+          onClick={handleSave}
+          disabled={isSaving}
+          className="flex items-center gap-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
+        >
+          <Save className="w-5 h-5" />
+          {isSaving ? 'Saving...' : 'Save Changes'}
+        </button>
+      </div>
+    </div>
+  );
+}
+```
+
 ## 📁 Step 6: Create AI Feature UI
 
 **File: `app/dashboard/ai/page.tsx`**

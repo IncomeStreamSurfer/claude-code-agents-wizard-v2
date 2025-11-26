@@ -25,10 +25,17 @@ Transform any Google AI Studio project OR your requirements into a complete, pro
 
 ## ⚡ Prerequisites (MUST Complete First!)
 
-### 1. Set Up Convex + Next.js Project
+### 1. Clone This Repository FIRST
 
 ```bash
-# Create new Convex + Next.js project
+# Clone the SaaS generator repository
+git clone https://github.com/IncomeStreamSurfer/claude-code-agents-wizard-v2.git
+cd claude-code-agents-wizard-v2
+
+# Checkout the app-generator branch
+git checkout app-generator
+
+# Now create the Convex project INSIDE this folder
 npx create-convex@latest my-saas-app
 
 # Select these options:
@@ -37,6 +44,9 @@ npx create-convex@latest my-saas-app
 
 # Navigate to project
 cd my-saas-app
+
+# Copy the .claude folder from parent into your project
+cp -r ../.claude ./
 
 # Start once to initialize Convex dashboard
 npm run dev
@@ -74,21 +84,30 @@ CLERK_SECRET_KEY=sk_...
 
 ## 🚀 Installation
 
+If you followed the prerequisites above, you already have everything set up!
+
 ```bash
-# Clone this repository
-git clone https://github.com/IncomeStreamSurfer/claude-code-agents-wizard-v2.git
-cd claude-code-agents-wizard-v2
-
-# Checkout the app-generator branch
-git checkout app-generator
-
-# Copy the .claude folder to your Convex project
-cp -r .claude /path/to/your-saas-project/
-
-# Navigate to your project
-cd /path/to/your-saas-project
+# You should already be in your project directory (my-saas-app)
+# with the .claude folder copied in
 
 # Start Claude Code
+claude
+
+# Then give it your inputs (see "Required Inputs" section below)
+```
+
+**Alternative: Add to existing Convex project**
+```bash
+# Clone generator repo somewhere
+git clone https://github.com/IncomeStreamSurfer/claude-code-agents-wizard-v2.git
+cd claude-code-agents-wizard-v2
+git checkout app-generator
+
+# Copy .claude to your existing project
+cp -r .claude /path/to/your-existing-convex-project/
+
+# Navigate to your project and start
+cd /path/to/your-existing-convex-project
 claude
 ```
 
