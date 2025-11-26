@@ -89,7 +89,7 @@ You receive:
   "faq": [
     {
       "question": "How accurate are the AI responses?",
-      "answer": "Our AI is powered by the latest GPT-4 and Claude models, providing highly accurate responses. For critical decisions, we always recommend verification."
+      "answer": "Our AI is powered by Google's latest Gemini models, providing highly accurate responses. For critical decisions, we always recommend verification."
     },
     {
       "question": "Is my data secure?",
@@ -260,7 +260,7 @@ You receive:
   ],
   "whySwitch": [
     "Save all your conversations and projects in one place",
-    "Choose between GPT-4, Claude, and Gemini models",
+    "Powered by Google's latest Gemini, Imagen, and Veo models",
     "Collaborate with your team on AI projects",
     "Better pricing for heavy users"
   ],
@@ -276,12 +276,13 @@ You receive:
 - ChatGPT Alternative
 - Jasper Alternative
 - Copy.ai Alternative
-- Claude Alternative
+- Midjourney Alternative (for image generation)
 - [Product] vs ChatGPT
 - [Product] vs Jasper
-- [Product] vs Copy.ai
+- [Product] vs Midjourney
 - Best AI Writing Tool 2025
 - Best AI Assistant 2025
+- Best AI Image Generator 2025
 - Top 10 AI Tools for [Use Case]
 
 ### 5. PROBLEM/SOLUTION PAGES

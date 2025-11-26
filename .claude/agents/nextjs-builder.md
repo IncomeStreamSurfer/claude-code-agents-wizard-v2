@@ -536,13 +536,54 @@ export default function AIToolsPage() {
 ```typescript
 'use client';
 
-import { useChat } from 'ai/react';
+import { useState } from 'react';
 import { Send } from 'lucide-react';
 
 export function Chat() {
-  const { messages, input, handleInputChange, handleSubmit, isLoading } = useChat({
-    api: '/api/ai/chat',
-  });
+  const [messages, setMessages] = useState<Array<{ role: string; content: string }>>([]);
+  const [input, setInput] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
+  const sendMessage = async () => {
+    if (!input.trim() || isLoading) return;
+
+    const userMessage = { role: 'user', content: input };
+    const newMessages = [...messages, userMessage];
+    setMessages(newMessages);
+    setInput('');
+    setIsLoading(true);
+
+    try {
+      const response = await fetch('/api/ai/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: newMessages }),
+      });
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let assistantContent = '';
+
+      while (true) {
+        const { done, value } = await reader!.read();
+        if (done) break;
+
+        const text = decoder.decode(value);
+        assistantContent += text;
+
+        setMessages([...newMessages, { role: 'assistant', content: assistantContent }]);
+      }
+    } catch (error) {
+      console.error('Chat error:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    sendMessage();
+  };
 
   return (
     <div className="flex flex-col h-[600px]">
@@ -550,12 +591,12 @@ export function Chat() {
       <div className="flex-1 overflow-y-auto space-y-4 mb-4">
         {messages.length === 0 && (
           <div className="text-center text-gray-500 py-8">
-            Start a conversation with AI
+            Start a conversation with Google AI
           </div>
         )}
-        {messages.map((message) => (
+        {messages.map((message, index) => (
           <div
-            key={message.id}
+            key={index}
             className={`flex ${
               message.role === 'user' ? 'justify-end' : 'justify-start'
             }`}
@@ -589,7 +630,7 @@ export function Chat() {
         <input
           type="text"
           value={input}
-          onChange={handleInputChange}
+          onChange={(e) => setInput(e.target.value)}
           placeholder="Type your message..."
           className="flex-1 border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
@@ -629,10 +670,11 @@ export function Generator() {
 
     setIsGenerating(true);
     try {
+      // IMPORTANT: The model parameter should come from lib/ai/models.ts DEFAULT_MODELS
+      // which is populated from research docs. DO NOT hardcode model names here.
       const response = await generateText({
         prompt,
-        provider: 'openai',
-        model: 'gpt-4o',
+        // model: Use the default from DEFAULT_MODELS.text (populated from research)
       });
       setResult(response);
     } catch (error) {
@@ -670,7 +712,7 @@ export function Generator() {
         className="flex items-center space-x-2 bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 disabled:opacity-50"
       >
         <Sparkles className="w-5 h-5" />
-        <span>{isGenerating ? 'Generating...' : 'Generate'}</span>
+        <span>{isGenerating ? 'Generating...' : 'Generate with Google AI'}</span>
       </button>
 
       {result && (
@@ -1214,7 +1256,7 @@ READY FOR TESTING: Yes
 2. **Server components** for data fetching where possible
 3. **Convex queries** automatically update in real-time
 4. **Clerk middleware** protects dashboard routes (landing pages are PUBLIC)
-5. **AI hooks** from ai/react package
+5. **Google AI streaming** implemented using fetch() and ReadableStream
 6. **Landing pages** are statically generated for fast loads
 7. **Sitemap** includes ALL landing pages for SEO indexing
 8. **CTAs** link to /sign-up with tracking params

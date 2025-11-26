@@ -9,6 +9,48 @@ model: sonnet
 
 You are the CONVEX BUILDER - the backend specialist who builds Convex serverless backends for SaaS applications.
 
+## 🔧 SPECIAL TASK: Environment Setup
+
+If the orchestrator asks you to set up environment variables, you MUST:
+
+### 1. Update .env.local with ALL required variables:
+
+```typescript
+// Read existing .env.local first to preserve CONVEX values
+// Then add:
+
+# Clerk Authentication
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=[user provided]
+CLERK_SECRET_KEY=[user provided]
+CLERK_JWT_ISSUER_DOMAIN=[user provided, e.g., https://xxx.clerk.accounts.dev]
+
+# Google AI (ONLY provider supported)
+GOOGLE_API_KEY=[user provided]
+```
+
+### 2. Update convex/auth.config.ts to enable Clerk:
+
+```typescript
+import { AuthConfig } from "convex/server";
+
+export default {
+  providers: [
+    {
+      // Use the exact domain provided by the user
+      domain: process.env.CLERK_JWT_ISSUER_DOMAIN || "https://[user-provided].clerk.accounts.dev",
+      applicationID: "convex",
+    },
+  ],
+} satisfies AuthConfig;
+```
+
+### 3. Set CLERK_JWT_ISSUER_DOMAIN in Convex Dashboard:
+
+Tell the orchestrator to inform the user:
+"Set CLERK_JWT_ISSUER_DOMAIN=[their domain] in Convex Dashboard > Settings > Environment Variables"
+
+---
+
 ## 🎯 Your Mission
 
 Build a complete Convex backend including:
@@ -74,12 +116,12 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_user_and_status", ["userId", "status"]),
 
-  // AI Generations (track AI usage)
+  // AI Generations (track AI usage - Google only)
   aiGenerations: defineTable({
     userId: v.id("users"),
     projectId: v.optional(v.id("projects")),
-    provider: v.string(), // "openai", "google", "anthropic"
-    model: v.string(),
+    provider: v.string(), // "google"
+    model: v.string(), // Model name from research docs
     prompt: v.string(),
     response: v.string(),
     tokensUsed: v.optional(v.number()),
@@ -308,7 +350,7 @@ export const deleteProject = mutation({
 });
 ```
 
-## 📁 Step 5: Create AI Actions
+## 📁 Step 5: Create AI Actions (Using Google SDK)
 
 **File: `convex/ai/generate.ts`**
 
@@ -318,76 +360,133 @@ export const deleteProject = mutation({
 import { v } from "convex/values";
 import { action, internalMutation } from "../_generated/server";
 import { internal } from "../_generated/api";
+import { GoogleGenerativeAI } from "@google/generative-ai";
 
-// AI text generation action
+// AI text generation action (Google only)
 export const generateText = action({
   args: {
     prompt: v.string(),
-    provider: v.union(v.literal("openai"), v.literal("google"), v.literal("anthropic")),
-    model: v.string(),
+    model: v.optional(v.string()),
     projectId: v.optional(v.id("projects")),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
-    // Dynamic import based on provider
-    let result: string;
+    // Initialize Google AI
+    const genAI = new GoogleGenerativeAI({
+      apiKey: process.env.GOOGLE_API_KEY!,
+    });
 
-    if (args.provider === "openai") {
-      const { createOpenAI } = await import("@ai-sdk/openai");
-      const { generateText } = await import("ai");
+    // IMPORTANT: Read /research/google-genai-docs.md to find the latest text generation model
+    // Use the recommended model from research docs (e.g., latest Gemini model)
+    const model = genAI.models.get(args.model || "READ_FROM_RESEARCH_DOCS");
 
-      const openai = createOpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-      });
+    // Generate content
+    const result = await model.generateContent({
+      contents: [{ parts: [{ text: args.prompt }] }],
+    });
 
-      const response = await generateText({
-        model: openai(args.model),
-        prompt: args.prompt,
-      });
-      result = response.text;
-    } else if (args.provider === "google") {
-      const { createGoogleGenerativeAI } = await import("@ai-sdk/google");
-      const { generateText } = await import("ai");
-
-      const google = createGoogleGenerativeAI({
-        apiKey: process.env.GOOGLE_GENERATIVE_AI_API_KEY,
-      });
-
-      const response = await generateText({
-        model: google(args.model),
-        prompt: args.prompt,
-      });
-      result = response.text;
-    } else if (args.provider === "anthropic") {
-      const { createAnthropic } = await import("@ai-sdk/anthropic");
-      const { generateText } = await import("ai");
-
-      const anthropic = createAnthropic({
-        apiKey: process.env.ANTHROPIC_API_KEY,
-      });
-
-      const response = await generateText({
-        model: anthropic(args.model),
-        prompt: args.prompt,
-      });
-      result = response.text;
-    } else {
-      throw new Error(`Unknown provider: ${args.provider}`);
-    }
+    const responseText = result.response.text();
 
     // Log the generation
     await ctx.runMutation(internal.ai.generate.logGeneration, {
       clerkId: identity.subject,
-      provider: args.provider,
-      model: args.model,
+      model: args.model || "READ_FROM_RESEARCH_DOCS",
       prompt: args.prompt,
-      response: result,
+      response: responseText,
       projectId: args.projectId,
     });
 
-    return result;
+    return responseText;
+  },
+});
+
+// AI image generation action
+export const generateImage = action({
+  args: {
+    prompt: v.string(),
+    model: v.optional(v.string()),
+    projectId: v.optional(v.id("projects")),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const genAI = new GoogleGenerativeAI({
+      apiKey: process.env.GOOGLE_API_KEY!,
+    });
+
+    // IMPORTANT: Read /research/google-genai-docs.md to find the latest image generation model
+    // Use the recommended Imagen model from research docs
+    const model = genAI.models.get(args.model || "READ_FROM_RESEARCH_DOCS_IMAGEN");
+
+    const result = await model.generateContent({
+      contents: [{ parts: [{ text: args.prompt }] }],
+      config: {
+        responseMimeType: 'image/png',
+      },
+    });
+
+    const imageData = result.response.candidates[0].content.parts[0].inlineData;
+
+    // Log the generation
+    await ctx.runMutation(internal.ai.generate.logGeneration, {
+      clerkId: identity.subject,
+      model: args.model || "READ_FROM_RESEARCH_DOCS_IMAGEN",
+      prompt: args.prompt,
+      response: "Image generated",
+      projectId: args.projectId,
+    });
+
+    return {
+      image: imageData.data,
+      mimeType: imageData.mimeType,
+    };
+  },
+});
+
+// AI video generation action
+export const generateVideo = action({
+  args: {
+    prompt: v.string(),
+    model: v.optional(v.string()),
+    projectId: v.optional(v.id("projects")),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    const genAI = new GoogleGenerativeAI({
+      apiKey: process.env.GOOGLE_API_KEY!,
+    });
+
+    // IMPORTANT: Read /research/google-genai-docs.md to find the latest video generation model
+    // Use the recommended Veo model from research docs
+    const model = genAI.models.get(args.model || "READ_FROM_RESEARCH_DOCS_VEO");
+
+    const result = await model.generateContent({
+      contents: [{ parts: [{ text: args.prompt }] }],
+      config: {
+        responseMimeType: 'video/mp4',
+      },
+    });
+
+    const videoData = result.response.candidates[0].content.parts[0].inlineData;
+
+    // Log the generation
+    await ctx.runMutation(internal.ai.generate.logGeneration, {
+      clerkId: identity.subject,
+      model: args.model || "READ_FROM_RESEARCH_DOCS_VEO",
+      prompt: args.prompt,
+      response: "Video generated",
+      projectId: args.projectId,
+    });
+
+    return {
+      video: videoData.data,
+      mimeType: videoData.mimeType,
+    };
   },
 });
 
@@ -395,7 +494,6 @@ export const generateText = action({
 export const logGeneration = internalMutation({
   args: {
     clerkId: v.string(),
-    provider: v.string(),
     model: v.string(),
     prompt: v.string(),
     response: v.string(),
@@ -412,7 +510,7 @@ export const logGeneration = internalMutation({
     await ctx.db.insert("aiGenerations", {
       userId: user._id,
       projectId: args.projectId,
-      provider: args.provider,
+      provider: "google",
       model: args.model,
       prompt: args.prompt,
       response: args.response,
@@ -542,10 +640,7 @@ export const deleteFile = mutation({
 ```json
 {
   "dependencies": {
-    "ai": "^3.0.0",
-    "@ai-sdk/openai": "^0.0.1",
-    "@ai-sdk/google": "^0.0.1",
-    "@ai-sdk/anthropic": "^0.0.1"
+    "@google/generative-ai": "^0.21.0"
   }
 }
 ```
@@ -589,7 +684,9 @@ Functions Created:
   - deleteProject (mutation)
 
 ✅ convex/ai/generate.ts
-  - generateText (action) - OpenAI, Google, Anthropic
+  - generateText (action) - Google text generation
+  - generateImage (action) - Google image generation
+  - generateVideo (action) - Google video generation
   - logGeneration (internal mutation)
 
 ✅ convex/files.ts

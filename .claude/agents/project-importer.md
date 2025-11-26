@@ -70,7 +70,9 @@ src/api/* or src/services/* - API calls
 // Pattern 1: Direct API
 import { GoogleGenerativeAI } from "@google/generative-ai";
 const genAI = new GoogleGenerativeAI(API_KEY);
-const model = genAI.getGenerativeModel({ model: "gemini-pro" });
+// NOTE: Model names like "gemini-pro" may be outdated
+// Always check current model names from research docs
+const model = genAI.getGenerativeModel({ model: "MODEL_NAME" });
 
 // Pattern 2: Chat
 const chat = model.startChat();
@@ -109,7 +111,8 @@ const [userInput, setUserInput] = useState('');
 
   "aiFeatures": {
     "provider": "google",
-    "models": ["gemini-pro", "gemini-pro-vision"],
+    "models": ["MODEL_NAMES_FROM_SOURCE_CODE"],
+    "notes": "These model names may be outdated - verify against research docs",
     "features": [
       {
         "name": "Text Generation",
@@ -243,18 +246,18 @@ const [userInput, setUserInput] = useState('');
 
 | Current Code | Target Code |
 |--------------|-------------|
-| `GoogleGenerativeAI` | `@ai-sdk/google` |
-| `genAI.getGenerativeModel()` | `google('gemini-1.5-flash')` |
-| `model.generateContent()` | `generateText()` or `streamText()` |
-| `model.startChat()` | `useChat()` hook |
+| `GoogleGenerativeAI` (old pattern) | `GoogleGenerativeAI` from `@google/generative-ai` |
+| `genAI.getGenerativeModel()` | `genAI.models.get('model-name')` |
+| `model.generateContent()` | Same, but verify model names from research |
+| `model.startChat()` | Same pattern, or custom streaming implementation |
 
 ## State to Convex
 
 | Current State | Convex Table | Notes |
 |---------------|--------------|-------|
 | `useState([projects])` | `projects` | Query: getUserProjects |
-| `useState([messages])` | `messages` or inline | Could use useChat built-in |
-| `localStorage.getItem()` | `projects` | Replace with Convex |
+| `useState([messages])` | `messages` or inline | Store chat history in Convex |
+| `localStorage.getItem()` | `projects` | Replace with Convex queries/mutations |
 ```
 
 ## 📋 Step 6: Extract Reusable Code
@@ -293,26 +296,23 @@ const [userInput, setUserInput] = useState('');
 
 ```json
 {
-  "replaceWith": {
-    "@google/generative-ai": "@ai-sdk/google + ai",
-    "react-router-dom": "Next.js App Router (built-in)"
-  },
   "keep": [
+    "@google/generative-ai",
     "tailwindcss",
     "lucide-react",
     "clsx"
   ],
   "add": [
     "@clerk/nextjs",
-    "convex",
-    "ai",
-    "@ai-sdk/google",
-    "@ai-sdk/openai"
+    "convex"
   ],
   "remove": [
-    "@google/generative-ai",
     "react-router-dom"
-  ]
+  ],
+  "notes": {
+    "@google/generative-ai": "Keep the same package - Google's native SDK",
+    "react-router-dom": "Replace with Next.js App Router (built-in)"
+  }
 }
 ```
 
@@ -326,9 +326,9 @@ Project Type: React (Create React App)
 Styling: Tailwind CSS
 
 AI Features Found:
-✅ Text Generation (gemini-pro)
-✅ Chat with History (gemini-pro)
-✅ Image Analysis (gemini-pro-vision)
+✅ Text Generation (model names from source - verify with research)
+✅ Chat with History (model names from source - verify with research)
+✅ Image Analysis (model names from source - verify with research)
 
 Components Identified:
 - App.jsx → layout.tsx + page.tsx
