@@ -24,7 +24,7 @@ NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=[user provided]
 CLERK_SECRET_KEY=[user provided]
 CLERK_JWT_ISSUER_DOMAIN=[user provided, e.g., https://xxx.clerk.accounts.dev]
 
-# Google AI (ONLY provider supported)
+# Google AI (single key for all Google AI services)
 GOOGLE_API_KEY=[user provided]
 ```
 
@@ -44,10 +44,35 @@ export default {
 } satisfies AuthConfig;
 ```
 
-### 3. Set CLERK_JWT_ISSUER_DOMAIN in Convex Dashboard:
+### 3. Set Convex Environment Variables (CRITICAL - YOU MUST RUN THESE!)
 
-Tell the orchestrator to inform the user:
-"Set CLERK_JWT_ISSUER_DOMAIN=[their domain] in Convex Dashboard > Settings > Environment Variables"
+**You MUST ACTUALLY RUN these commands using the Bash tool:**
+
+```bash
+# ALWAYS run from the project directory
+cd [PROJECT_DIR]
+
+# Set Clerk JWT domain (required for auth to work)
+npx convex env set CLERK_JWT_ISSUER_DOMAIN="https://[user-provided].clerk.accounts.dev"
+
+# Set Google API key (single key for all Google AI services)
+npx convex env set GOOGLE_API_KEY="[user provided]"
+```
+
+**DO NOT just document these - ACTUALLY RUN THEM with the Bash tool!**
+
+**WHY THIS IS CRITICAL:**
+- Convex actions run on Convex servers, NOT your local machine
+- They need their OWN environment variables set in Convex
+- Without this, AI generation and auth will FAIL
+- The user gave you the API key - USE IT to set Convex env vars
+
+**Example:**
+```bash
+cd /path/to/project
+npx convex env set CLERK_JWT_ISSUER_DOMAIN="https://your-app.clerk.accounts.dev"
+npx convex env set GOOGLE_API_KEY="AIzaSy..."
+```
 
 ---
 
@@ -116,12 +141,12 @@ export default defineSchema({
     .index("by_user", ["userId"])
     .index("by_user_and_status", ["userId", "status"]),
 
-  // AI Generations (track AI usage - Google only)
+  // AI Generations (track AI usage)
   aiGenerations: defineTable({
     userId: v.id("users"),
     projectId: v.optional(v.id("projects")),
-    provider: v.string(), // "google"
-    model: v.string(), // Model name from research docs
+    provider: v.string(), // "openai", "google", "anthropic"
+    model: v.string(),
     prompt: v.string(),
     response: v.string(),
     tokensUsed: v.optional(v.number()),
@@ -153,7 +178,7 @@ export default defineSchema({
 import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
-// Get current user
+// Get current user - creates user if doesn't exist
 export const getCurrentUser = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -168,7 +193,48 @@ export const getCurrentUser = query({
   },
 });
 
-// Create or update user (called on sign-in)
+// Sync user from Clerk - called automatically on sign-in/sign-up
+// This ensures user exists in Convex database
+export const syncUser = mutation({
+  args: {
+    clerkId: v.string(),
+    email: v.string(),
+    name: v.optional(v.string()),
+    imageUrl: v.optional(v.string()),
+  },
+  handler: async (ctx, args) => {
+    // Verify the user is authenticated
+    const identity = await ctx.auth.getUserIdentity();
+    if (!identity) throw new Error("Not authenticated");
+
+    // Check if user already exists
+    const existingUser = await ctx.db
+      .query("users")
+      .withIndex("by_clerk_id", (q) => q.eq("clerkId", args.clerkId))
+      .unique();
+
+    if (existingUser) {
+      // Update existing user with latest info from Clerk
+      await ctx.db.patch(existingUser._id, {
+        email: args.email,
+        name: args.name || existingUser.name,
+        imageUrl: args.imageUrl || existingUser.imageUrl,
+      });
+      return existingUser._id;
+    }
+
+    // Create new user
+    return await ctx.db.insert("users", {
+      clerkId: args.clerkId,
+      email: args.email,
+      name: args.name,
+      imageUrl: args.imageUrl,
+      createdAt: Date.now(),
+    });
+  },
+});
+
+// Create or update user (manual version with args)
 export const upsertUser = mutation({
   args: {
     clerkId: v.string(),
@@ -198,6 +264,91 @@ export const upsertUser = mutation({
   },
 });
 ```
+
+## 📁 Step 3b: Create User Sync Component (CRITICAL!)
+
+**This component ensures users are synced to Convex on EVERY sign-in/sign-up**
+
+**File: `components/UserSync.tsx`**
+
+```typescript
+"use client";
+
+import { useUser } from "@clerk/nextjs";
+import { useMutation } from "convex/react";
+import { api } from "@/convex/_generated/api";
+import { useEffect, useRef } from "react";
+
+export function UserSync() {
+  const { user, isLoaded, isSignedIn } = useUser();
+  const syncUser = useMutation(api.users.syncUser);
+  const hasSynced = useRef(false);
+
+  useEffect(() => {
+    // Only sync once per session when user is loaded and signed in
+    if (isLoaded && isSignedIn && user && !hasSynced.current) {
+      hasSynced.current = true;
+
+      // Pass all user data from Clerk to Convex
+      syncUser({
+        clerkId: user.id,
+        email: user.primaryEmailAddress?.emailAddress || "",
+        name: user.fullName || user.firstName || undefined,
+        imageUrl: user.imageUrl || undefined,
+      })
+        .then(() => {
+          console.log("User synced to Convex:", user.id);
+        })
+        .catch((error) => {
+          console.error("Failed to sync user:", error);
+          // Reset so it can retry
+          hasSynced.current = false;
+        });
+    }
+
+    // Reset when user signs out
+    if (isLoaded && !isSignedIn) {
+      hasSynced.current = false;
+    }
+  }, [isLoaded, isSignedIn, user, syncUser]);
+
+  return null; // This component doesn't render anything
+}
+```
+
+**IMPORTANT: Add UserSync to providers.tsx**
+
+**File: `app/providers.tsx`**
+
+```typescript
+'use client';
+
+import { ClerkProvider, useAuth } from '@clerk/nextjs';
+import { ConvexProviderWithClerk } from 'convex/react-clerk';
+import { ConvexReactClient } from 'convex/react';
+import { ReactNode } from 'react';
+import { UserSync } from '@/components/UserSync';
+
+const convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);
+
+export function Providers({ children }: { children: ReactNode }) {
+  return (
+    <ClerkProvider>
+      <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
+        <UserSync /> {/* Auto-syncs user to Convex on sign-in/sign-up */}
+        {children}
+      </ConvexProviderWithClerk>
+    </ClerkProvider>
+  );
+}
+```
+
+**WHY THIS MATTERS:**
+- When a user signs in OR creates an account, Clerk handles auth
+- But Convex database needs the user record too
+- UserSync component automatically creates/updates the user in Convex
+- This runs on every page load when signed in, ensuring sync
+- No manual webhook setup required!
 
 ## 📁 Step 4: Create Project Functions
 
@@ -350,7 +501,7 @@ export const deleteProject = mutation({
 });
 ```
 
-## 📁 Step 5: Create AI Actions (Using Google SDK)
+## 📁 Step 5: Create AI Actions
 
 **File: `convex/ai/generate.ts`**
 
@@ -360,133 +511,44 @@ export const deleteProject = mutation({
 import { v } from "convex/values";
 import { action, internalMutation } from "../_generated/server";
 import { internal } from "../_generated/api";
-import { GoogleGenerativeAI } from "@google/generative-ai";
+import { GoogleGenerativeAI } from "@google/genai";
 
-// AI text generation action (Google only)
+// AI text generation action using Google Gemini
 export const generateText = action({
   args: {
     prompt: v.string(),
-    model: v.optional(v.string()),
+    modelName: v.optional(v.string()), // Optional: specific model from research
     projectId: v.optional(v.id("projects")),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
     if (!identity) throw new Error("Not authenticated");
 
-    // Initialize Google AI
-    const genAI = new GoogleGenerativeAI({
-      apiKey: process.env.GOOGLE_API_KEY!,
+    const apiKey = process.env.GOOGLE_API_KEY;
+    if (!apiKey) throw new Error("GOOGLE_API_KEY not set");
+
+    const genAI = new GoogleGenerativeAI({ apiKey });
+
+    // IMPORTANT: modelName should come from GOOGLE_MODELS.text (populated from research)
+    // If not provided, use the default text model you found in research
+    const model = genAI.getGenerativeModel({
+      model: args.modelName || 'DEFAULT_TEXT_MODEL_FROM_RESEARCH'
     });
 
-    // IMPORTANT: Read /research/google-genai-docs.md to find the latest text generation model
-    // Use the recommended model from research docs (e.g., latest Gemini model)
-    const model = genAI.models.get(args.model || "READ_FROM_RESEARCH_DOCS");
-
-    // Generate content
-    const result = await model.generateContent({
-      contents: [{ parts: [{ text: args.prompt }] }],
-    });
-
-    const responseText = result.response.text();
+    const result = await model.generateContent(args.prompt);
+    const response = await result.response;
+    const text = response.text();
 
     // Log the generation
     await ctx.runMutation(internal.ai.generate.logGeneration, {
       clerkId: identity.subject,
-      model: args.model || "READ_FROM_RESEARCH_DOCS",
+      model: args.modelName || 'DEFAULT_TEXT_MODEL_FROM_RESEARCH',
       prompt: args.prompt,
-      response: responseText,
+      response: text,
       projectId: args.projectId,
     });
 
-    return responseText;
-  },
-});
-
-// AI image generation action
-export const generateImage = action({
-  args: {
-    prompt: v.string(),
-    model: v.optional(v.string()),
-    projectId: v.optional(v.id("projects")),
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-
-    const genAI = new GoogleGenerativeAI({
-      apiKey: process.env.GOOGLE_API_KEY!,
-    });
-
-    // IMPORTANT: Read /research/google-genai-docs.md to find the latest image generation model
-    // Use the recommended Imagen model from research docs
-    const model = genAI.models.get(args.model || "READ_FROM_RESEARCH_DOCS_IMAGEN");
-
-    const result = await model.generateContent({
-      contents: [{ parts: [{ text: args.prompt }] }],
-      config: {
-        responseMimeType: 'image/png',
-      },
-    });
-
-    const imageData = result.response.candidates[0].content.parts[0].inlineData;
-
-    // Log the generation
-    await ctx.runMutation(internal.ai.generate.logGeneration, {
-      clerkId: identity.subject,
-      model: args.model || "READ_FROM_RESEARCH_DOCS_IMAGEN",
-      prompt: args.prompt,
-      response: "Image generated",
-      projectId: args.projectId,
-    });
-
-    return {
-      image: imageData.data,
-      mimeType: imageData.mimeType,
-    };
-  },
-});
-
-// AI video generation action
-export const generateVideo = action({
-  args: {
-    prompt: v.string(),
-    model: v.optional(v.string()),
-    projectId: v.optional(v.id("projects")),
-  },
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-    if (!identity) throw new Error("Not authenticated");
-
-    const genAI = new GoogleGenerativeAI({
-      apiKey: process.env.GOOGLE_API_KEY!,
-    });
-
-    // IMPORTANT: Read /research/google-genai-docs.md to find the latest video generation model
-    // Use the recommended Veo model from research docs
-    const model = genAI.models.get(args.model || "READ_FROM_RESEARCH_DOCS_VEO");
-
-    const result = await model.generateContent({
-      contents: [{ parts: [{ text: args.prompt }] }],
-      config: {
-        responseMimeType: 'video/mp4',
-      },
-    });
-
-    const videoData = result.response.candidates[0].content.parts[0].inlineData;
-
-    // Log the generation
-    await ctx.runMutation(internal.ai.generate.logGeneration, {
-      clerkId: identity.subject,
-      model: args.model || "READ_FROM_RESEARCH_DOCS_VEO",
-      prompt: args.prompt,
-      response: "Video generated",
-      projectId: args.projectId,
-    });
-
-    return {
-      video: videoData.data,
-      mimeType: videoData.mimeType,
-    };
+    return text;
   },
 });
 
@@ -510,7 +572,7 @@ export const logGeneration = internalMutation({
     await ctx.db.insert("aiGenerations", {
       userId: user._id,
       projectId: args.projectId,
-      provider: "google",
+      provider: "google",  // Always Google now
       model: args.model,
       prompt: args.prompt,
       response: args.response,
@@ -640,7 +702,7 @@ export const deleteFile = mutation({
 ```json
 {
   "dependencies": {
-    "@google/generative-ai": "^0.21.0"
+    "@google/genai": "latest"
   }
 }
 ```
@@ -668,13 +730,14 @@ CONVEX BACKEND COMPLETE: ✅
 Schema Created:
 - users: User profiles synced with Clerk
 - projects: User's saved work with status
-- aiGenerations: AI usage tracking
+- aiGenerations: AI usage tracking (Google provider)
 - files: File upload metadata
 
 Functions Created:
 ✅ convex/users.ts
   - getCurrentUser (query)
   - upsertUser (mutation)
+  - syncUser (mutation)
 
 ✅ convex/projects.ts
   - getUserProjects (query)
@@ -684,9 +747,7 @@ Functions Created:
   - deleteProject (mutation)
 
 ✅ convex/ai/generate.ts
-  - generateText (action) - Google text generation
-  - generateImage (action) - Google image generation
-  - generateVideo (action) - Google video generation
+  - generateText (action) - Google Gemini
   - logGeneration (internal mutation)
 
 ✅ convex/files.ts
@@ -702,12 +763,19 @@ Indexes Created:
 - aiGenerations: by_user, by_project
 - files: by_user, by_project
 
+Environment Variables Set:
+✅ CLERK_JWT_ISSUER_DOMAIN (Convex env)
+✅ GOOGLE_API_KEY (Convex env)
+
+Dependencies Installed:
+✅ @google/genai (in convex/package.json)
+
 Real-time Features:
 - All queries automatically update in real-time
 - Projects list updates when created/deleted
 - File list updates on upload
 
-READY FOR FRONTEND INTEGRATION: Yes
+READY FOR AI IMPLEMENTOR: Yes
 ```
 
 ## ⚠️ Important Notes
