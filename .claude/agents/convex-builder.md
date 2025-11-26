@@ -46,10 +46,38 @@ export default {
 } satisfies AuthConfig;
 ```
 
-### 3. Set CLERK_JWT_ISSUER_DOMAIN in Convex Dashboard:
+### 3. Set Convex Environment Variables (CRITICAL - YOU MUST RUN THESE!)
 
-Tell the orchestrator to inform the user:
-"Set CLERK_JWT_ISSUER_DOMAIN=[their domain] in Convex Dashboard > Settings > Environment Variables"
+**You MUST ACTUALLY RUN these commands using the Bash tool:**
+
+```bash
+# ALWAYS run from the project directory
+cd [PROJECT_DIR]
+
+# Set Clerk JWT domain (required for auth to work)
+npx convex env set CLERK_JWT_ISSUER_DOMAIN="https://[user-provided].clerk.accounts.dev"
+
+# Set AI provider API keys (based on what user is using)
+# Only set the ones the user provided!
+npx convex env set GOOGLE_GENERATIVE_AI_API_KEY="[user provided if using Google]"
+npx convex env set OPENAI_API_KEY="[user provided if using OpenAI]"
+npx convex env set ANTHROPIC_API_KEY="[user provided if using Anthropic]"
+```
+
+**DO NOT just document these - ACTUALLY RUN THEM with the Bash tool!**
+
+**WHY THIS IS CRITICAL:**
+- Convex actions run on Convex servers, NOT your local machine
+- They need their OWN environment variables set in Convex
+- Without this, AI generation and auth will FAIL
+- The user gave you the API keys - USE THEM to set Convex env vars
+
+**Example (if user provided Google API key):**
+```bash
+cd /Users/davison/my-saas-app
+npx convex env set CLERK_JWT_ISSUER_DOMAIN="https://legible-mudfish-25.clerk.accounts.dev"
+npx convex env set GOOGLE_GENERATIVE_AI_API_KEY="AIzaSyCBXwebtNnIQwPSHi3Ks9cKo9-eWXjDbDs"
+```
 
 ---
 

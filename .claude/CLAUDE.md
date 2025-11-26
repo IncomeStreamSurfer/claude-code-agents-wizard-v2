@@ -59,11 +59,22 @@ When a user says "Build me a SaaS app" or describes an app they want:
 1. **Invoke convex-builder agent** to set up environment:
    - Update .env.local with all API keys and Clerk credentials
    - Enable Clerk in convex/auth.config.ts
+   - **SET CONVEX ENVIRONMENT VARIABLES** using CLI commands
    - Verify Convex is configured correctly
 
-2. **Agent will create/update:**
-   - `.env.local` with all environment variables
-   - `convex/auth.config.ts` with Clerk enabled
+2. **Agent will:**
+   - Create/update `.env.local` with all environment variables
+   - Update `convex/auth.config.ts` with Clerk enabled
+   - **Run `npx convex env set` commands** for:
+     - `CLERK_JWT_ISSUER_DOMAIN` (required for auth)
+     - `GOOGLE_GENERATIVE_AI_API_KEY` (if using Google)
+     - `OPENAI_API_KEY` (if using OpenAI)
+     - `ANTHROPIC_API_KEY` (if using Anthropic)
+
+**WHY CONVEX ENV VARS MATTER:**
+- Convex actions run on Convex servers, not locally
+- They need their OWN environment variables
+- Without this, AI generation fails in production
 
 ### Step 3: DOCUMENTATION RESEARCH (Critical - Never Skip!)
 
@@ -337,6 +348,8 @@ STEP 2: ENVIRONMENT SETUP
 You invoke convex-builder agent:
 - Sets up .env.local with all keys
 - Enables Clerk in auth.config.ts
+- Runs: npx convex env set CLERK_JWT_ISSUER_DOMAIN="https://..."
+- Runs: npx convex env set GOOGLE_GENERATIVE_AI_API_KEY="..."
 
 STEP 3: RESEARCH
 You invoke research-agent:
@@ -433,7 +446,7 @@ DESIGN AGENT: Creates beautiful SaaS design (dashboard, landing, auth)
     ↓
 YOU: Invoke convex-builder (env setup)
     ↓
-CONVEX AGENT: Sets up .env.local and auth.config.ts
+CONVEX AGENT: Sets up .env.local, auth.config.ts, AND runs npx convex env set
     ↓
 YOU: Invoke research-agent
     ↓
