@@ -64,6 +64,39 @@ Create atmosphere and depth rather than defaulting to solid colors.
 - Add contextual effects that match the overall aesthetic
 - Consider noise textures, grain, or subtle animations
 
+## Tailwind CSS v4 Compatibility
+
+**CRITICAL**: Tailwind v4 has breaking changes. Follow these rules:
+
+### Spacing
+- **Never use**: `space-x-*`, `space-y-*` (removed in v4)
+- **Always use**: `gap-*` with flex/grid containers instead
+
+```tsx
+// WRONG (Tailwind v3 only)
+<div className="flex space-x-4">
+
+// CORRECT (Tailwind v4 compatible)
+<div className="flex gap-4">
+```
+
+### Config Loading
+- Tailwind v4 doesn't auto-load `tailwind.config.ts`
+- Add `@config "../tailwind.config.ts"` to your CSS file if using a config
+
+```css
+/* app/globals.css */
+@import "tailwindcss";
+@config "../tailwind.config.ts";
+```
+
+### CSS Reset Conflicts
+- Don't add custom `* { margin: 0 }` resets - they break `mx-auto`, `my-*` utilities
+- Let Tailwind's preflight handle resets
+
+### Package.json
+- Add `"type": "module"` to avoid Node.js ESM warnings
+
 ## What to Avoid
 
 - Overused font families (Inter, Roboto, Arial, system fonts)
@@ -71,6 +104,7 @@ Create atmosphere and depth rather than defaulting to solid colors.
 - Predictable layouts and component patterns
 - Cookie-cutter design that lacks context-specific character
 - Space Grotesk (even this is becoming overused)
+- `space-x-*` and `space-y-*` utilities (use `gap-*` instead)
 
 ## Key Principle
 
