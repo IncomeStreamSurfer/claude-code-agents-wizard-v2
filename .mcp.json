@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "brightdata": {
+      "type": "sse",
+      "url": "https://mcp.brightdata.com/sse?token=<your_api_key>"
+    }
+  }
+}
